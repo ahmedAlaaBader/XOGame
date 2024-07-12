@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ImageView fitHeight="408.0" fitWidth="607.0" layoutX="-3.0" layoutY="-3.0">
+         <image>
+            <Image url="@../../../../picpic.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="98.0" fitWidth="109.0" layoutX="7.0" layoutY="14.0">
+         <image>
+            <Image url="@../../../../OIP-removebg-preview%20(1).png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="98.0" fitWidth="118.0" layoutX="468.0" layoutY="14.0">
+         <image>
+            <Image url="@../../../../OIP-removebg-preview%20(1).png" />
+         </image>
+      </ImageView>
+      <Region layoutX="11.0" layoutY="144.0" prefHeight="243.0" prefWidth="583.0" style="-fx-border-color: black;">
+         <effect>
+            <DropShadow height="9.13" radius="19.8825" spread="0.84" width="72.4" />
+         </effect>
+      </Region>
+      <Button fx:id="signUpBtn" layoutX="31.0" layoutY="333.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="546.0" style="-fx-background-color: gold; -fx-border-color: black;" text="Sign Up">
+         <font>
+            <Font name="System Bold Italic" size="16.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <effect>
+            <DropShadow height="72.4" radius="31.25" spread="0.19" width="54.6" />
+         </effect>
+      </Button>
+      <GridPane layoutX="23.0" layoutY="155.0" prefHeight="162.0" prefWidth="139.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.33334350585938" minWidth="0.0" prefWidth="0.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="10.0" prefWidth="200.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Text fx:id="username" strokeType="OUTSIDE" strokeWidth="0.0" text="User Name" textAlignment="CENTER" wrappingWidth="134.486328125" GridPane.columnIndex="1">
+               <font>
+                  <Font name="System Bold Italic" size="18.0" />
+               </font>
+            </Text>
+            <Text fx:id="Email" strokeType="OUTSIDE" strokeWidth="0.0" text="Email" textAlignment="CENTER" wrappingWidth="131.48959350585938" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <font>
+                  <Font name="System Bold Italic" size="18.0" />
+               </font>
+            </Text>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Password" textAlignment="CENTER" wrappingWidth="126.22720336914062" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <font>
+                  <Font name="System Bold Italic" size="18.0" />
+               </font>
+            </Text>
+         </children>
+      </GridPane>
+      <TextField fx:id="userNameText" layoutX="153.0" layoutY="169.0" prefHeight="32.0" prefWidth="417.0" promptText="please insert your name" style="-fx-background-color: ivory;" />
+      <TextField fx:id="emailText" layoutX="153.0" layoutY="220.0" prefHeight="32.0" prefWidth="417.0" promptText="please enter your email" style="-fx-background-color: ivory;" />
+      <PasswordField fx:id="passField" layoutX="153.0" layoutY="272.0" prefHeight="32.0" prefWidth="417.0" promptText="passsword must be strong" style="-fx-background-color: ivory;" />
+   </children>
+</AnchorPane>
