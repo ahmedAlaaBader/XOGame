@@ -83,6 +83,8 @@ public class singlePlayerModeBase extends AnchorPane
 
         getChildren().add(backGroundPic);
         getChildren().add(buttonContainer);
+        this.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+        this.getStyleClass().add("background");
 
     }
     private void handleExitButtonAction(ActionEvent event) 
@@ -115,6 +117,7 @@ public class singlePlayerModeBase extends AnchorPane
         button.setText(text);
         button.setFont(new Font(BUTTON_FONT_STYLE, BUTTON_FONT_SIZE));
         button.setCursor(Cursor.HAND);
+        button.getStyleClass().add("custom-button");
         return button;
     }
 }

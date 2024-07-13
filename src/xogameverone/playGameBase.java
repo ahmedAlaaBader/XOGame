@@ -249,16 +249,10 @@ public  class playGameBase extends BorderPane {
         exitBtn.setMnemonicParsing(false);
         exitBtn.setPrefWidth(154.0);
         exitBtn.setText("Exit");
-        exitBtn.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
-        exitBtn.setTextFill(javafx.scene.paint.Color.RED);
-        exitBtn.setFont(new Font("System Bold", 20.0));
         exitBtn.setOnAction(this::handleExitButtonAction);
+        exitBtn.getStyleClass().add("custom-button");
 
-        colorAdjust.setBrightness(-0.57);
-        colorAdjust.setContrast(-0.08);
-        colorAdjust.setHue(-0.12);
-        colorAdjust.setSaturation(0.07);
-        exitBtn.setEffect(colorAdjust);
+      
         setBottom(exitBtn);
 
         gridPane.getColumnConstraints().add(columnConstraints);
@@ -287,6 +281,8 @@ public  class playGameBase extends BorderPane {
         gridPane0.getChildren().add(text2);
         gridPane0.getChildren().add(xScoreTxt);
         gridPane0.getChildren().add(oScoreTxt);
+        this.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+        
 
     }
     private void handleButtonProperties(Button button)
@@ -297,6 +293,7 @@ public  class playGameBase extends BorderPane {
         button.setPrefWidth(91.0);
         button.setFont(new Font("System Bold Italic", 30.0));
         button.setCursor(Cursor.HAND);
+        button.getStyleClass().add("game-button");
         button.setOnMouseClicked((MouseEvent event) -> {
             switch (selectModeBase.selectMode) {
                 case "Two players" :  

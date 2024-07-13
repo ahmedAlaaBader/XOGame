@@ -80,6 +80,8 @@ public class selectModeBase extends AnchorPane
 
         getChildren().add(backGroundPic);
         getChildren().add(buttonContainer);
+        this.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+        this.getStyleClass().add("background");
     }
     
     private Button createButton(String text)
@@ -93,6 +95,7 @@ public class selectModeBase extends AnchorPane
         button.setText(text);
         button.setFont(new Font(BUTTON_FONT_STYLE, BUTTON_FONT_SIZE));
         button.setCursor(Cursor.HAND);
+        button.getStyleClass().add("custom-button");
         return button;
     }
     private void handleEsayOrHardButtonAction(ActionEvent event) 
