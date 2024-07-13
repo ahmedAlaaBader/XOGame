@@ -43,6 +43,7 @@ public class selectModeBase extends AnchorPane
             
         });
         onlineBtn = createButton("Online");
+        onlineBtn.setOnAction(this::handleOnLineButtonAction);
         
         VBox buttonContainer = new VBox(20, singlePlayerBtn, twoPlayersBtn, onlineBtn);
         buttonContainer.setAlignment(Pos.CENTER);
@@ -114,6 +115,15 @@ public class selectModeBase extends AnchorPane
         // Get the current stage
         Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
         stage.setScene(singlePlayerScene);
+        stage.show();
+    }
+    private void handleOnLineButtonAction(ActionEvent event) 
+    {
+        Parent longIn = new LogIn();
+        Scene selectModeScene = new Scene(longIn);
+        // Get the current stage
+        Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+        stage.setScene(selectModeScene);
         stage.show();
     }
 }
