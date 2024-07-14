@@ -55,8 +55,9 @@ public  class playGameBase extends BorderPane {
     private final Button[][] btn;
     private int counter = 0;
     VideoPalyer playVideo = new VideoPalyer();
-    String winVideoPath = "file:///F:/java%20labs/XOgametest/src/videos/winnerVideo.mp4";
-    String loseVideoPath = "file:///F:/java%20labs/XOgametest/src/videos/loseVideo.mp4";
+    String winVideoPath = "file:///D:/iti/Project/client/src/videos/loseVideo.mp4";
+    String loseVideoPath = "file:///D:/iti/Project/client/src/videos/winnerVideo.mp4";
+    
   
     private static final Random random = new Random();
    

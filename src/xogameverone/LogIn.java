@@ -1,10 +1,6 @@
 package xogameverone;
 
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
-import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -16,19 +12,24 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LogIn extends AnchorPane {
 
     protected final ImageView imageView;
     protected final ImageView imageView0;
     protected final ImageView imageView1;
-    protected final Region region;
-    protected final DropShadow dropShadow;
     protected final Button logIn;
     protected final Button signUp;
     protected final DropShadow dropShadow0;
@@ -44,14 +45,12 @@ public class LogIn extends AnchorPane {
     protected final PasswordField passwordTextField;
     private static final double BUTTON_WIDTH = 510.0;
     private static final double BUTTON_HEIGHT = 10.0;
-    
+
     public LogIn() {
 
         imageView = new ImageView();
         imageView0 = new ImageView();
         imageView1 = new ImageView();
-        region = new Region();
-        dropShadow = new DropShadow();
         dropShadow0 = new DropShadow();
         gridPane = new GridPane();
         columnConstraints = new ColumnConstraints();
@@ -59,8 +58,6 @@ public class LogIn extends AnchorPane {
         rowConstraints = new RowConstraints();
         rowConstraints0 = new RowConstraints();
         rowConstraints1 = new RowConstraints();
-        
-        
 
         setMaxHeight(USE_PREF_SIZE);
         setMaxWidth(USE_PREF_SIZE);
@@ -87,22 +84,10 @@ public class LogIn extends AnchorPane {
         imageView1.setLayoutY(14.0);
         imageView1.setImage(new Image(getClass().getResource("/images/OIP-removebg-preview (1).png").toExternalForm()));
 
-//        region.setLayoutX(11.0);
-//        region.setLayoutY(144.0);
-//        region.setPrefHeight(243.0);
-//        region.setPrefWidth(583.0);
-//        region.setStyle("-fx-border-color: black;");
-//
-//        dropShadow.setHeight(9.13);
-//        dropShadow.setRadius(19.8825);
-//        dropShadow.setSpread(0.84);
-//        dropShadow.setWidth(72.4);
-//        region.setEffect(dropShadow);
+        logIn = createButton(306.0, "Login");
+        logIn.setOnAction(this::handleLogin);
 
-        logIn=createButton(306.0,"Login");
-       // logIn.setOnAction(this::handleLogin);
-        
-        signUp=createButton(354.0,"Sign Up");
+        signUp = createButton(354.0, "Sign Up");
         signUp.setOnAction(this::goToSignUpPage);
 
         dropShadow0.setHeight(72.4);
@@ -137,14 +122,12 @@ public class LogIn extends AnchorPane {
         rowConstraints1.setMinHeight(10.0);
         rowConstraints1.setPrefHeight(30.0);
         rowConstraints1.setVgrow(javafx.scene.layout.Priority.SOMETIMES);
-        
-        userNameLabel = creatLabel (0 ,0,"User Name");  
-        passWordLabel = creatLabel (1 ,0,"password");
-        
-        userNameTextFiled=creatTextField (164.0 ,"Please insert your name");
-        passwordTextField= creatPasswordField (220.0 ,"Please enter your password name");
 
-        
+        userNameLabel = createLabel(0, 0, "User Name");
+        passWordLabel = createLabel(1, 0, "Password");
+
+        userNameTextFiled = createTextField(164.0, "Please insert your name");
+        passwordTextField = createPasswordField(220.0, "Please enter your password");
 
         gridPane.getColumnConstraints().add(columnConstraints);
         gridPane.getColumnConstraints().add(columnConstraints0);
@@ -152,8 +135,8 @@ public class LogIn extends AnchorPane {
         gridPane.getRowConstraints().add(rowConstraints0);
         gridPane.getRowConstraints().add(rowConstraints1);
         gridPane.getChildren().addAll(userNameLabel, passWordLabel);
-        
-        getChildren().addAll(imageView, imageView0, imageView1, region, logIn, signUp, gridPane, userNameTextFiled, passwordTextField);
+
+        getChildren().addAll(imageView, imageView0, imageView1, logIn, signUp, gridPane, userNameTextFiled, passwordTextField);
         this.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
     }
 
@@ -166,43 +149,31 @@ public class LogIn extends AnchorPane {
         primaryStage.show();
     }
 
-//    private void handleLogin(ActionEvent event) {
-//    String userName = userNameTextFiled.getText();
-//    String password = passwordTextField.getText();
-//    
-//    try {
-//        String loginResult = DAL.checkSignIn(userName, password);
-//        
-//        switch (loginResult) {
-//            case "Logged in successfully":
-//                DAL.login(userName, password);
-//                System.out.println("Login successful");
-//                // Perform any UI update or navigation here
-//                break;
-//            case "Password is incorrect":
-//                passwordTextField.setText("");
-//                userNameTextFiled.setText("");
-//                passwordTextField.setPromptText("Password is incorrect");
-//                break;
-//            case "UserName is incorrect":
-//                userNameTextFiled.setText("");
-//                passwordTextField.setText("");
-//                userNameTextFiled.setPromptText("Username is incorrect");
-//                break;
-//            case "This UserName is already signed-in":
-//                userNameTextFiled.setText("");
-//                passwordTextField.setText("");
-//                userNameTextFiled.setPromptText("This UserName is already signed-in");
-//                break;
-//        }
-//    } catch (SQLException e) {
-//        e.printStackTrace();
-//        // Handle database access error
-//    }
-//}
-    
-    private Text creatLabel (int row ,int col,String label){
-        Text text =new Text();
+    private void handleLogin(ActionEvent event) {
+        new Thread(this::runClient).start();
+    }
+
+    private void runClient() {
+        try (Socket mySocket = new Socket(InetAddress.getLocalHost(), 5007);
+             DataOutputStream myDataOutStream = new DataOutputStream(mySocket.getOutputStream());
+             DataInputStream myDataInStream = new DataInputStream(mySocket.getInputStream())) {
+
+            
+            // Send username and password to server for test only 
+            myDataOutStream.writeUTF("Ahmed");
+            myDataOutStream.writeUTF("123");
+
+            // Receive server response
+            String myMessage = myDataInStream.readUTF();
+            System.out.println("Server Response: " + myMessage);
+
+        } catch (IOException ex) {
+            Logger.getLogger(XOGameVerOne.class.getName()).log(Level.SEVERE, "Failed to connect to the server", ex);
+        }
+    }
+
+    private Text createLabel(int row, int col, String label) {
+        Text text = new Text();
         GridPane.setColumnIndex(text, col);
         GridPane.setRowIndex(text, row);
         text.setStrokeType(javafx.scene.shape.StrokeType.OUTSIDE);
@@ -213,8 +184,9 @@ public class LogIn extends AnchorPane {
         text.setFont(new Font("System Bold Italic", 18.0));
         return text;
     }
-    private TextField creatTextField (double yDiraction ,String PromptText){
-        TextField text =new TextField();
+
+    private TextField createTextField(double yDiraction, String PromptText) {
+        TextField text = new TextField();
         text.setLayoutX(153.0);
         text.setLayoutY(yDiraction);
         text.setPrefHeight(32.0);
@@ -223,8 +195,9 @@ public class LogIn extends AnchorPane {
         text.setStyle("-fx-background-color: ivory;");
         return text;
     }
-    private PasswordField creatPasswordField (double yDiraction ,String PromptText){
-        PasswordField text =new PasswordField();
+
+    private PasswordField createPasswordField(double yDiraction, String PromptText) {
+        PasswordField text = new PasswordField();
         text.setLayoutX(153.0);
         text.setLayoutY(yDiraction);
         text.setPrefHeight(32.0);
@@ -233,8 +206,8 @@ public class LogIn extends AnchorPane {
         text.setStyle("-fx-background-color: ivory;");
         return text;
     }
-     private Button createButton(double yDiraction,String text)
-    {
+
+    private Button createButton(double yDiraction, String text) {
         Button button = new Button();
         button.setLayoutX(31.0);
         button.setLayoutY(yDiraction);
@@ -245,8 +218,7 @@ public class LogIn extends AnchorPane {
         button.setText(text);
         button.setCursor(Cursor.HAND);
         button.getStyleClass().add("loginAndSignUp-button");
-        
+
         return button;
     }
-
 }
