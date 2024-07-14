@@ -154,21 +154,43 @@ public class LogIn extends AnchorPane {
     }
 
     private void runClient() {
-        try (Socket mySocket = new Socket(InetAddress.getLocalHost(), 5007);
+        try (Socket mySocket = new Socket(InetAddress.getLocalHost(), 5015);
              DataOutputStream myDataOutStream = new DataOutputStream(mySocket.getOutputStream());
              DataInputStream myDataInStream = new DataInputStream(mySocket.getInputStream())) {
 
-            
-            // Send username and password to server for test only 
-            myDataOutStream.writeUTF("Ahmed");
-            myDataOutStream.writeUTF("123");
+            String userName = userNameTextFiled.getText();
+            String password = passwordTextField.getText();
 
-            // Receive server response
+            myDataOutStream.writeUTF(userName);
+            myDataOutStream.writeUTF(password);
+
             String myMessage = myDataInStream.readUTF();
             System.out.println("Server Response: " + myMessage);
+            
+            switch (myMessage) {
+                case "Logged in successfully":
+                    System.out.println("Login successful");
+                    // Perform any UI update or navigation here
+                    break;
+                case "Password is incorrect":
+                    passwordTextField.setText("");
+                    passwordTextField.setPromptText("Password is incorrect");
+                    break;
+                case "Username is incorrect":
+                    userNameTextFiled.setText("");
+                    userNameTextFiled.setPromptText("Username is incorrect");
+                    break;
+                case "This UserName is already signed-in":
+                    userNameTextFiled.setText("");
+                    userNameTextFiled.setPromptText("This UserName is already signed-in");
+                    break;
+                default:
+                    System.out.println("Unknown response from server: " + myMessage);
+                    break;
+            }
 
-        } catch (IOException ex) {
-            Logger.getLogger(XOGameVerOne.class.getName()).log(Level.SEVERE, "Failed to connect to the server", ex);
+        } catch (IOException e) {
+            Logger.getLogger(LogIn.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
