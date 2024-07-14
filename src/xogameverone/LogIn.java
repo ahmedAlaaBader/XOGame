@@ -154,7 +154,7 @@ public class LogIn extends AnchorPane {
     }
 
     private void runClient() {
-        try (Socket mySocket = new Socket(InetAddress.getLocalHost(), 5015);
+        try (Socket mySocket = new Socket(InetAddress.getLocalHost(), 5013);
              DataOutputStream myDataOutStream = new DataOutputStream(mySocket.getOutputStream());
              DataInputStream myDataInStream = new DataInputStream(mySocket.getInputStream())) {
 
