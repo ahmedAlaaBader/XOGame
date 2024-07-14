@@ -1,5 +1,10 @@
 package xogameverone;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -16,8 +21,14 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.application.Platform;
+
 
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import static javafx.scene.layout.Region.USE_PREF_SIZE;
@@ -106,7 +117,7 @@ public class SignUp extends AnchorPane {
         region.setEffect(dropShadow);
 
         signUp=createButton(320,"Sign Up");
-        //SignUp.setOnAction(this::handleSignUp);
+        signUp.setOnAction(this::handleSignUp);
 
         dropShadow0.setHeight(72.4);
         dropShadow0.setRadius(31.25);
@@ -216,6 +227,78 @@ public class SignUp extends AnchorPane {
 //PlayerHandler.logIn(email,password);
 });*/
 
+       
+    }
+    private void handleSignUp(ActionEvent event) {
+    new Thread(this::runClient).start();
+}
+
+private void runClient() {
+    try (Socket mySocket = new Socket(InetAddress.getLocalHost(), 5013);
+         DataOutputStream myDataOutStream = new DataOutputStream(mySocket.getOutputStream());
+         DataInputStream myDataInStream = new DataInputStream(mySocket.getInputStream())) {
+        
+        
+
+        String userName = usernametext.getText();
+        String userEmail = emailtext.getText();
+        String password = passwordtext.getText();
+        
+        if (userName.isEmpty() || userEmail.isEmpty() || password.isEmpty()) 
+        {
+            usernametext.clear();
+            emailtext.clear();
+            passwordtext.clear();
+            usernametext.setPromptText("Please fill out this field");
+            emailtext.setPromptText("Please fill out this field");
+            passwordtext.setPromptText("Please fill out this field");
+        } 
+        else
+        {
+            
+            if(!isValidEmail(userEmail)){
+                emailtext.clear();
+                emailtext.setPromptText("Enter a Valid Mail");
+            }
+            else{
+        
+        myDataOutStream.writeUTF("SignUp");
+        myDataOutStream.writeUTF(userName);
+        myDataOutStream.writeUTF(userEmail);
+        myDataOutStream.writeUTF(password);
+
+        String message = myDataInStream.readUTF();
+
+        switch (message) {
+            case "Username already exists":
+                usernametext.clear();
+                emailtext.clear();
+                passwordtext.clear();
+                usernametext.setPromptText("Username already exists");
+                break;
+            case "Email already registered":
+                usernametext.clear();
+                emailtext.clear();
+                passwordtext.clear();
+                emailtext.setPromptText("Email already registered");
+                break;
+            case "Registered Successfully":
+                showAlert(AlertType.INFORMATION,"Success", "Registration successful!");
+                usernametext.clear();
+                emailtext.clear();
+                passwordtext.clear();
+                usernametext.setPromptText("Registration successful!");
+                break;
+        }
+        }
+        }
+    } catch (IOException ex) {
+        Logger.getLogger(SignUp.class.getName()).log(Level.SEVERE, null, ex);
+    
+    }
+}
+private boolean isValidEmail(String email) {
+        return email.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}");
     }
 //   private void handleSignUp(ActionEvent event) {
 //    String username = usernametext.getText();
@@ -274,13 +357,15 @@ public class SignUp extends AnchorPane {
 //      //  return email.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}");
 //    //}
 //
-//    private void showAlert(String title, String message) {
-//        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//        alert.setTitle(title);
-//        alert.setHeaderText(null);
-//        alert.setContentText(message);
-//        alert.showAndWait();
-//    }  
+    private void showAlert(AlertType alertType, String title, String message) {
+    Platform.runLater(() -> {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    });
+    }
     //will make an interface later on to reduse redundancy (dont forget to use this functions)
    private Button createButton(double yDiraction,String text)
     {

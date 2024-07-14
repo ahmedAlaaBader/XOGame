@@ -160,23 +160,34 @@ public class LogIn extends AnchorPane {
 
             String userName = userNameTextFiled.getText();
             String password = passwordTextField.getText();
+            
 
+            if (userName.isEmpty() || password.isEmpty()) 
+            {
+            userNameTextFiled.clear();
+            passwordTextField.clear();
+            userNameTextFiled.setPromptText("Please fill out this field");
+            passwordTextField.setPromptText("Please fill out this field");
+            } 
+            else {
+            
+            myDataOutStream.writeUTF("Login");
             myDataOutStream.writeUTF(userName);
             myDataOutStream.writeUTF(password);
 
-            String myMessage = myDataInStream.readUTF();
-            System.out.println("Server Response: " + myMessage);
+            String message = myDataInStream.readUTF();
+            //System.out.println("Server Response: " + message);
             
-            switch (myMessage) {
+            switch (message) {
                 case "Logged in successfully":
                     System.out.println("Login successful");
-                    // Perform any UI update or navigation here
+                    
                     break;
                 case "Password is incorrect":
                     passwordTextField.setText("");
                     passwordTextField.setPromptText("Password is incorrect");
                     break;
-                case "Username is incorrect":
+                case "UserName is incorrect":
                     userNameTextFiled.setText("");
                     userNameTextFiled.setPromptText("Username is incorrect");
                     break;
@@ -185,8 +196,9 @@ public class LogIn extends AnchorPane {
                     userNameTextFiled.setPromptText("This UserName is already signed-in");
                     break;
                 default:
-                    System.out.println("Unknown response from server: " + myMessage);
+                    System.out.println("Unknown response from server: " + message);
                     break;
+            }
             }
 
         } catch (IOException e) {
