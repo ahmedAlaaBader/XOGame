@@ -24,6 +24,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.Parent;
 
 public class LogIn extends AnchorPane {
 
@@ -141,12 +142,15 @@ public class LogIn extends AnchorPane {
     }
 
     private void goToSignUpPage(ActionEvent ev) {
-        Stage primaryStage = new Stage();
-        SignUp signUpPane = new SignUp();
-        Scene scene = new Scene(signUpPane, 600, 400);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Sign Up");
-        primaryStage.show();
+        
+        
+        
+        Parent signUpPage = new SignUp();
+        Scene selectModeScene = new Scene(signUpPage);
+        // Get the current stage
+        Stage stage = (Stage) ((Button) ev.getSource()).getScene().getWindow();
+        stage.setScene(selectModeScene);
+        stage.show();
     }
 
     private void handleLogin(ActionEvent event) {

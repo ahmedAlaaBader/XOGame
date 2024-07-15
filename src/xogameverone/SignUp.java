@@ -30,6 +30,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import static javafx.scene.layout.Region.USE_PREF_SIZE;
 
@@ -118,6 +119,7 @@ public class SignUp extends AnchorPane {
 
         signUp=createButton(320,"Sign Up");
         signUp.setOnAction(this::handleSignUp);
+        
 
         dropShadow0.setHeight(72.4);
         dropShadow0.setRadius(31.25);
@@ -287,7 +289,7 @@ private void runClient() {
                 usernametext.clear();
                 emailtext.clear();
                 passwordtext.clear();
-                usernametext.setPromptText("Registration successful!");
+                signUp.setOnAction(this::goToLoginPage);
                 break;
         }
         }
@@ -300,63 +302,7 @@ private void runClient() {
 private boolean isValidEmail(String email) {
         return email.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}");
     }
-//   private void handleSignUp(ActionEvent event) {
-//    String username = usernametext.getText();
-//    String email = emailtext.getText();
-//    String password = passwordtext.getText();
-//
-//    try {
-//        if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
-//            usernametext.clear();
-//            emailtext.clear();
-//            passwordtext.clear();
-//            usernametext.setPromptText("Please fill out this field");
-//            emailtext.setPromptText("Please fill out this field");
-//            passwordtext.setPromptText("Please fill out this field");
-//            return;
-//        }else{
-//
-//        String signUpResult = DAL.checkSignUp(username, email);
-//        System.out.println(signUpResult);
-//        
-//        switch (signUpResult) {
-//            case "Username already exists":
-//                usernametext.clear();
-//                emailtext.clear();
-//                passwordtext.clear();
-//                usernametext.setPromptText("Username already exists");
-//                break;
-//            case "Email already registered":
-//                usernametext.clear();
-//                emailtext.clear();
-//                passwordtext.clear();
-//                emailtext.setPromptText("Email already registered");
-//                break;
-//            case "Registered Successfully":
-//                DAL.signUp(username, email, password);
-//                //showAlert("Success", "Registration successful!");
-//                
-//                usernametext.clear();
-//                emailtext.clear();
-//                passwordtext.clear();
-//                usernametext.setPromptText("Registration successful!");
-//                break;
-//            default:
-//                showAlert("Error", "Unexpected result: " + signUpResult);
-//                break;
-//        }
-//        }
-//    } catch (SQLException e) {
-//        showAlert("Error", "Database error: " + e.getMessage());
-//        e.printStackTrace();
-//    }
-//}
-//
-//
-//    //private boolean isValidEmail(String email) {
-//      //  return email.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}");
-//    //}
-//
+
     private void showAlert(AlertType alertType, String title, String message) {
     Platform.runLater(() -> {
         Alert alert = new Alert(alertType);
@@ -412,6 +358,17 @@ private boolean isValidEmail(String email) {
         text.setPromptText(PromptText);
         text.setStyle("-fx-background-color: ivory;");
         return text;
+    }
+    
+    
+    private void goToLoginPage(ActionEvent event) 
+    {
+        Parent longIn = new LogIn();
+        Scene selectModeScene = new Scene(longIn);
+        // Get the current stage
+        Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+        stage.setScene(selectModeScene);
+        stage.show();
     }
    
 }
