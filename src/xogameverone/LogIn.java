@@ -24,9 +24,10 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.Parent;
 
 public class LogIn extends AnchorPane {
-
+     
     protected final ImageView imageView;
     protected final ImageView imageView0;
     protected final ImageView imageView1;
@@ -45,9 +46,10 @@ public class LogIn extends AnchorPane {
     protected final PasswordField passwordTextField;
     private static final double BUTTON_WIDTH = 510.0;
     private static final double BUTTON_HEIGHT = 10.0;
+    protected final Button twoPlayersBtn;
 
     public LogIn() {
-
+        
         imageView = new ImageView();
         imageView0 = new ImageView();
         imageView1 = new ImageView();
@@ -161,7 +163,7 @@ public class LogIn extends AnchorPane {
             String userName = userNameTextFiled.getText();
             String password = passwordTextField.getText();
             
-
+            Stage s=new Stage();
             if (userName.isEmpty() || password.isEmpty()) 
             {
             userNameTextFiled.clear();
@@ -177,11 +179,13 @@ public class LogIn extends AnchorPane {
 
             String message = myDataInStream.readUTF();
             //System.out.println("Server Response: " + message);
-            
             switch (message) {
                 case "Logged in successfully":
-                    System.out.println("Login successful");
-                    
+                   selectModeBase root = new selectModeBase();
+                   Scene scene = new Scene(root);
+                   s.setScene(scene);
+                   s.setTitle("XO Game");
+                   s.show();
                     break;
                 case "Password is incorrect":
                     passwordTextField.setText("");
@@ -254,5 +258,14 @@ public class LogIn extends AnchorPane {
         button.getStyleClass().add("loginAndSignUp-button");
 
         return button;
+    }
+    private void handleEsayOrHardButtonAction(ActionEvent event) 
+    {
+        Parent playGame = new playGameBase();
+        Scene selectModeScene = new Scene(playGame);
+        // Get the current stage
+        Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+        stage.setScene(selectModeScene);
+        stage.show();
     }
 }

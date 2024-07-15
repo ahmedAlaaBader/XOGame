@@ -57,9 +57,12 @@ public  class playGameBase extends BorderPane {
     VideoPalyer playVideo = new VideoPalyer();
     String winVideoPath = "file:///D:/iti/Project/client/src/videos/loseVideo.mp4";
     String loseVideoPath = "file:///D:/iti/Project/client/src/videos/winnerVideo.mp4";
+    String [][] onlineMovement;
+    String move;
     
   
     private static final Random random = new Random();
+    
    
     
     public playGameBase() {
@@ -283,6 +286,7 @@ public  class playGameBase extends BorderPane {
         gridPane0.getChildren().add(xScoreTxt);
         gridPane0.getChildren().add(oScoreTxt);
         this.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+        
         
 
     }
@@ -555,5 +559,17 @@ public  class playGameBase extends BorderPane {
 
     return "";
 }
+   
+   public void movements(ActionEvent event)
+   {
+       Button clickedButton = (Button) event.getSource();
+       int row = GridPane.getRowIndex(clickedButton);
+       int column =  GridPane.getColumnIndex(clickedButton);
+       String btnTxt = clickedButton.getText();
+       move =row + ","+column+","+btnTxt;
+       onlineMovement[row][column] = btnTxt;
+       
+   }
+   
 
 }
