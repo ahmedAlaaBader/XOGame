@@ -272,13 +272,13 @@ private void runClient() {
         String message = myDataInStream.readUTF();
 
         switch (message) {
-            case "Username already exists":
-                usernametext.clear();
-                usernametext.setPromptText("Username already exists");
+             case "Username already exists":
+            createTextValidation(usernametext, "Username already exists");
+               
                 break;
             case "Email already registered":
                 emailtext.clear();
-                emailtext.setPromptText("Email already registered");
+                createTextValidation(emailtext, "Email already exists");
                 break;
             case "Registered Successfully":
                 showAlert(AlertType.INFORMATION,"Success", "Registration successful!");
@@ -365,6 +365,12 @@ private boolean isValidEmail(String email) {
         Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
         stage.setScene(selectModeScene);
         stage.show();
+    }
+     public void createTextValidation(TextField text, String message){
+    
+                text.clear();
+                text.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
+                text.setPromptText(message);   
     }
    
 }

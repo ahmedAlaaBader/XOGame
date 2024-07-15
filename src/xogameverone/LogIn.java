@@ -187,16 +187,13 @@ public class LogIn extends AnchorPane {
                     
                     break;
                 case "Password is incorrect":
-                    passwordTextField.clear();
-                    passwordTextField.setPromptText("Password is incorrect");
+            createTextValidation(passwordTextField,"Password is incorrect");
                     break;
                 case "UserName is incorrect":
-                    userNameTextFiled.clear();
-                    userNameTextFiled.setPromptText("Username is incorrect");
+            createTextValidation(userNameTextFiled,"UserName is incorrect");
                     break;
                 case "This UserName is already signed-in":
-                    userNameTextFiled.clear();
-                    userNameTextFiled.setPromptText("This UserName is already signed-in");
+                    createTextValidation(userNameTextFiled,"This UserName is already signed-in");
                     break;
                 default:
                     System.out.println("Unknown response from server: " + message);
@@ -257,5 +254,11 @@ public class LogIn extends AnchorPane {
         button.getStyleClass().add("loginAndSignUp-button");
 
         return button;
+    }
+     public void createTextValidation(TextField text, String message){
+    
+                text.clear();
+                text.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
+                text.setPromptText(message);   
     }
 }
