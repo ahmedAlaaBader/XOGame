@@ -180,7 +180,6 @@ public class LogIn extends AnchorPane {
             myDataOutStream.writeUTF(password);
 
             String message = myDataInStream.readUTF();
-            //System.out.println("Server Response: " + message);
             
             switch (message) {
                 case "Logged in successfully":
@@ -188,15 +187,15 @@ public class LogIn extends AnchorPane {
                     
                     break;
                 case "Password is incorrect":
-                    passwordTextField.setText("");
+                    passwordTextField.clear();
                     passwordTextField.setPromptText("Password is incorrect");
                     break;
                 case "UserName is incorrect":
-                    userNameTextFiled.setText("");
+                    userNameTextFiled.clear();
                     userNameTextFiled.setPromptText("Username is incorrect");
                     break;
                 case "This UserName is already signed-in":
-                    userNameTextFiled.setText("");
+                    userNameTextFiled.clear();
                     userNameTextFiled.setPromptText("This UserName is already signed-in");
                     break;
                 default:

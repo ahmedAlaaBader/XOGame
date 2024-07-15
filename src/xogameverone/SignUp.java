@@ -274,14 +274,10 @@ private void runClient() {
         switch (message) {
             case "Username already exists":
                 usernametext.clear();
-                emailtext.clear();
-                passwordtext.clear();
                 usernametext.setPromptText("Username already exists");
                 break;
             case "Email already registered":
-                usernametext.clear();
                 emailtext.clear();
-                passwordtext.clear();
                 emailtext.setPromptText("Email already registered");
                 break;
             case "Registered Successfully":
