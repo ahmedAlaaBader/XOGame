@@ -83,7 +83,7 @@ public class selectModeBase extends AnchorPane
         getChildren().add(buttonContainer);
         this.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
         this.getStyleClass().add("background");
-        String soundFilePath = "file:/D:/iti/Project/client/src/Sounds/wrong-place-129242.mp3";
+        String soundFilePath = "file:///F:/java%20labs/simi%20final/client/XOGame/src/Sounds/wrong-place-129242.mp3";
         Sound_Player.SoundPlayer.playSound(soundFilePath);
      }
     
