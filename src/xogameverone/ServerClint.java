@@ -15,7 +15,7 @@ public class ServerClint implements Runnable
     private Socket clientSocket;
     private DataInputStream dis;
     private DataOutputStream dos;
-     playGameBase pgb = new playGameBase(); 
+    playGameBase pgb = new playGameBase(); 
     ServerClint()
     {
       try {

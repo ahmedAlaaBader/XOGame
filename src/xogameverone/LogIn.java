@@ -46,7 +46,7 @@ public class LogIn extends AnchorPane {
     protected final PasswordField passwordTextField;
     private static final double BUTTON_WIDTH = 510.0;
     private static final double BUTTON_HEIGHT = 10.0;
-    protected final Button twoPlayersBtn;
+   // protected final Button twoPlayersBtn;
 
     public LogIn() {
         
@@ -181,7 +181,8 @@ public class LogIn extends AnchorPane {
             //System.out.println("Server Response: " + message);
             switch (message) {
                 case "Logged in successfully":
-                   selectModeBase root = new selectModeBase();
+                    //System.out.println("Server Response: " + message);
+                   LogIn root = new LogIn();
                    Scene scene = new Scene(root);
                    s.setScene(scene);
                    s.setTitle("XO Game");
