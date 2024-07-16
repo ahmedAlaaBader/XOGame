@@ -49,6 +49,7 @@ public  class playGameBase extends BorderPane {
     protected final Button btn12;
     protected final Button btn22;
     protected final GridPane gridPane0;
+    protected final GridPane gridPane1;
     protected final ColumnConstraints columnConstraints2;
     protected final ColumnConstraints columnConstraints3;
     protected final ColumnConstraints columnConstraints4;
@@ -61,6 +62,7 @@ public  class playGameBase extends BorderPane {
     protected final Text xScoreTxt;
     protected final Text oScoreTxt;
     protected final Button exitBtn;
+    protected final Button recordeBtn;
     protected final ColorAdjust colorAdjust;
     private String currentPlayer = "X"; 
     private final Button[][] btn;
@@ -95,6 +97,7 @@ public  class playGameBase extends BorderPane {
         btn12 = new Button();
         btn22 = new Button();
         gridPane0 = new GridPane();
+        gridPane1 = new GridPane();
         columnConstraints2 = new ColumnConstraints();
         columnConstraints3 = new ColumnConstraints();
         columnConstraints4 = new ColumnConstraints();
@@ -107,6 +110,7 @@ public  class playGameBase extends BorderPane {
         xScoreTxt = new Text();
         oScoreTxt = new Text();
         exitBtn = new Button();
+        recordeBtn = new Button();
         colorAdjust = new ColorAdjust();
 
         btn = new Button[][] {
@@ -192,6 +196,7 @@ public  class playGameBase extends BorderPane {
 
          
         setCenter(gridPane);
+        
 
         BorderPane.setAlignment(gridPane0, javafx.geometry.Pos.CENTER);
         gridPane0.setPrefHeight(112.0);
@@ -276,6 +281,19 @@ public  class playGameBase extends BorderPane {
 
       
         setBottom(exitBtn);
+        
+        BorderPane.setAlignment(recordeBtn, javafx.geometry.Pos.CENTER);
+        recordeBtn.setMnemonicParsing(false);
+        recordeBtn.setPrefWidth(154.0);
+        recordeBtn.setText("recorde");
+        recordeBtn.setOnAction(this::handleExitButtonAction);
+        recordeBtn.getStyleClass().add("custom-button");
+
+      
+        gridPane1.add(recordeBtn, 0, 1);
+        gridPane1.add(exitBtn, 0, 2);
+
+        setBottom(gridPane1);
 
         gridPane.getColumnConstraints().add(columnConstraints);
         gridPane.getColumnConstraints().add(columnConstraints0);
@@ -319,7 +337,7 @@ public  class playGameBase extends BorderPane {
             switch (selectModeBase.selectMode) {
                 case "Two players" :  
                     handlePlayerMove(button);
-                    
+                    playRecordedGame();
                     break;
                 case "Easy":  
                     handlePlayerMove(button);
@@ -363,7 +381,7 @@ public  class playGameBase extends BorderPane {
         stage.show();
     }//will be at interface later
     
-    private void handlePlayerMove(Button button) {
+    public  void handlePlayerMove(Button button) {
         
         if (button.getText().isEmpty()) {
             Sound_Player.SoundPlayer.playSound(sound);
@@ -594,7 +612,7 @@ public  class playGameBase extends BorderPane {
 
             try (
                 BufferedWriter writer = new BufferedWriter(new FileWriter("D:\\iti\\Project\\client\\src\\recording\\game_moves.txt", true))) {
-                String move = currentPlayer +row + "," + col + "\n";
+                String move = currentPlayer +"," + row + "," + col + "\n";
                 writer.write(move);
                 writer.newLine();
             } catch (IOException e) {

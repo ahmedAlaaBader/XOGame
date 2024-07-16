@@ -23,15 +23,14 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.application.Platform;
-
 
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
 import static javafx.scene.layout.Region.USE_PREF_SIZE;
 
 public class SignUp extends AnchorPane {
@@ -96,14 +95,13 @@ public class SignUp extends AnchorPane {
         imageView0.setFitWidth(109.0);
         imageView0.setLayoutX(7.0);
         imageView0.setLayoutY(14.0);
-         imageView0.setImage(new Image(getClass().getResource("/images/OIP-removebg-preview (1).png").toExternalForm()));
+        imageView0.setImage(new Image(getClass().getResource("/images/OIP-removebg-preview (1).png").toExternalForm()));
 
         imageView1.setFitHeight(98.0);
         imageView1.setFitWidth(118.0);
         imageView1.setLayoutX(468.0);
         imageView1.setLayoutY(14.0);
         imageView1.setImage(new Image(getClass().getResource("/images/OIP-removebg-preview (1).png").toExternalForm()));
-
 
         region.setLayoutX(11.0);
         region.setLayoutY(144.0);
@@ -117,9 +115,8 @@ public class SignUp extends AnchorPane {
         dropShadow.setWidth(72.4);
         region.setEffect(dropShadow);
 
-        signUp=createButton(320,"Sign Up");
+        signUp = createButton(320, "Sign Up");
         signUp.setOnAction(this::handleSignUp);
-        
 
         dropShadow0.setHeight(72.4);
         dropShadow0.setRadius(31.25);
@@ -219,95 +216,98 @@ public class SignUp extends AnchorPane {
         getChildren().add(emailtext);
         getChildren().add(passwordtext);
         this.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
-       
-        
-       /* SignUp.setOnAction(e->{
-        String username=usernametext.getText();
-        String email= emailtext.getText();
-        String password =passwordtext.getText();
-
-//PlayerHandler.logIn(email,password);
-});*/
-
-       
     }
+
     private void handleSignUp(ActionEvent event) {
-    new Thread(this::runClient).start();
-}
+        new Thread(this::runClient).start();
+    }
 
-private void runClient() {
-    try (Socket mySocket = new Socket(InetAddress.getLocalHost(), 5013);
-         DataOutputStream myDataOutStream = new DataOutputStream(mySocket.getOutputStream());
-         DataInputStream myDataInStream = new DataInputStream(mySocket.getInputStream())) {
-        
-        
+    private void runClient() {
+        try (Socket mySocket = new Socket(InetAddress.getLocalHost(), 5013);
+             DataOutputStream myDataOutStream = new DataOutputStream(mySocket.getOutputStream());
+             DataInputStream myDataInStream = new DataInputStream(mySocket.getInputStream())) {
 
-        String userName = usernametext.getText();
-        String userEmail = emailtext.getText();
-        String password = passwordtext.getText();
-        
-        if (userName.isEmpty() || userEmail.isEmpty() || password.isEmpty()) 
-        {
-            usernametext.clear();
-            emailtext.clear();
-            passwordtext.clear();
-            usernametext.setPromptText("Please fill out this field");
-            emailtext.setPromptText("Please fill out this field");
-            passwordtext.setPromptText("Please fill out this field");
-        } 
-        else
-        {
-            
-            if(!isValidEmail(userEmail)){
-                createTextValidation(emailtext, "Enter a Valid Mail");
-            }
-            else{
-        
-        myDataOutStream.writeUTF("SignUp");
-        myDataOutStream.writeUTF(userName);
-        myDataOutStream.writeUTF(userEmail);
-        myDataOutStream.writeUTF(password);
+            String userName = usernametext.getText();
+            String userEmail = emailtext.getText();
+            String password = passwordtext.getText();
 
-        String message = myDataInStream.readUTF();
-
-        switch (message) {
-            case "Username already exists":
-               createTextValidation(usernametext, "Username already exists");
-                break;
-            case "Email already registered":
-                createTextValidation(emailtext,"Email already registered");
-                break;
-            case "Registered Successfully":
-                showAlert(AlertType.INFORMATION,"Success", "Registration successful!");
+            if (userName.isEmpty() || userEmail.isEmpty() || password.isEmpty()) {
                 usernametext.clear();
                 emailtext.clear();
                 passwordtext.clear();
-                signUp.setOnAction(this::goToLoginPage);
-                break;
+                usernametext.setPromptText("Please fill out this field");
+                emailtext.setPromptText("Please fill out this field");
+                passwordtext.setPromptText("Please fill out this field");
+            } else {
+                if (!isValidEmail(userEmail)) {
+                    createTextValidation(emailtext, "Enter a Valid Mail");
+                } else {
+                    myDataOutStream.writeUTF("SignUp");
+                    myDataOutStream.writeUTF(userName);
+                    myDataOutStream.writeUTF(userEmail);
+                    myDataOutStream.writeUTF(password);
+
+                    String message = myDataInStream.readUTF();
+
+                    switch (message) {
+                        case "Username already exists":
+                            createTextValidation(usernametext, "Username already exists");
+                            break;
+                        case "Email already registered":
+                            createTextValidation(emailtext, "Email already registered");
+                            break;
+                        case "Registered Successfully":
+                            showAlert(AlertType.CONFIRMATION, "Success", "Registration successful! OK for login, cancel for sign up again");
+                            break;
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(SignUp.class.getName()).log(Level.SEVERE, null, ex);
         }
-        }
-        }
-    } catch (IOException ex) {
-        Logger.getLogger(SignUp.class.getName()).log(Level.SEVERE, null, ex);
-    
     }
-}
-private boolean isValidEmail(String email) {
+
+    private boolean isValidEmail(String email) {
         return email.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}");
     }
 
     private void showAlert(AlertType alertType, String title, String message) {
-    Platform.runLater(() -> {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    });
+        Platform.runLater(() -> {
+            Alert alert = new Alert(alertType);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+
+            if (alertType == AlertType.CONFIRMATION) {
+                alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+                alert.showAndWait().ifPresent(response -> {
+                    if (response == ButtonType.OK) {
+                        Platform.runLater(this::goToLoginPage);
+                    }
+                });
+            } else {
+                alert.showAndWait();
+            }
+        });
     }
-    //will make an interface later on to reduse redundancy (dont forget to use this functions)
-   private Button createButton(double yDiraction,String text)
-    {
+
+    private void goToLoginPage() {
+        Parent logIn = new LogIn();
+        Scene loginScene = new Scene(logIn);
+        Platform.runLater(() -> {
+            Stage stage = (Stage) signUp.getScene().getWindow();
+            stage.setScene(loginScene);
+            stage.show();
+        });
+    }
+
+    public void createTextValidation(TextField text, String message) {
+        text.clear();
+        text.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
+        text.setPromptText(message);
+    }
+
+    private Button createButton(double yDiraction, String text) {
         Button button = new Button();
         button.setLayoutX(31.0);
         button.setLayoutY(yDiraction);
@@ -320,8 +320,9 @@ private boolean isValidEmail(String email) {
         button.getStyleClass().add("loginAndSignUp-button");
         return button;
     }
-   private Text creatLabel (int row ,int col,String label){
-        Text text =new Text();
+
+    private Text creatLabel(int row, int col, String label) {
+        Text text = new Text();
         GridPane.setColumnIndex(text, col);
         GridPane.setRowIndex(text, row);
         text.setStrokeType(javafx.scene.shape.StrokeType.OUTSIDE);
@@ -332,8 +333,9 @@ private boolean isValidEmail(String email) {
         text.setFont(new Font("System Bold Italic", 18.0));
         return text;
     }
-    private TextField creatTextField (double yDiraction ,String PromptText){
-        TextField text =new TextField();
+
+    private TextField creatTextField(double yDiraction, String PromptText) {
+        TextField text = new TextField();
         text.setLayoutX(153.0);
         text.setLayoutY(yDiraction);
         text.setPrefHeight(32.0);
@@ -342,8 +344,9 @@ private boolean isValidEmail(String email) {
         text.setStyle("-fx-background-color: ivory;");
         return text;
     }
-    private PasswordField creatPasswordField (double yDiraction ,String PromptText){
-        PasswordField text =new PasswordField();
+
+    private PasswordField creatPasswordField(double yDiraction, String PromptText) {
+        PasswordField text = new PasswordField();
         text.setLayoutX(153.0);
         text.setLayoutY(yDiraction);
         text.setPrefHeight(32.0);
@@ -352,23 +355,6 @@ private boolean isValidEmail(String email) {
         text.setStyle("-fx-background-color: ivory;");
         return text;
     }
-    
-    
-    private void goToLoginPage(ActionEvent event) 
-    {
-        Parent longIn = new LogIn();
-        Scene selectModeScene = new Scene(longIn);
-        Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        stage.setScene(selectModeScene);
-        stage.show();
-    }
-    
-    public void createTextValidation(TextField text, String message){
-    
-                text.clear();
-                text.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
-                text.setPromptText(message);   
-    }
-   
 }
+
 

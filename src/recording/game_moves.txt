@@ -1,24 +1,18 @@
-O: Row 1, Column 1
+O,1,0
 
-X: Row 1, Column 0
+X,2,0
 
-O: Row 2, Column 0
+O,0,0
 
-X: Row 2, Column 1
+X,1,1
 
-O: Row 0, Column 0
+O,2,1
 
-X: Row 0, Column 1
+X,0,1
 
-O: Row 2, Column 2
+O,0,2
 
-O1,0
+X,2,2
 
-O2,0
-
-O2,2
-
-O1,2
-
-O1,0
+O,1,2
 

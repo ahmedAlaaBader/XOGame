@@ -20,10 +20,12 @@ import javafx.stage.Stage;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.scene.Parent;
 
 public class LogIn extends AnchorPane {
@@ -158,53 +160,60 @@ public class LogIn extends AnchorPane {
     }
 
     private void runClient() {
-        try (Socket mySocket = new Socket(InetAddress.getLocalHost(), 5013);
-             DataOutputStream myDataOutStream = new DataOutputStream(mySocket.getOutputStream());
-             DataInputStream myDataInStream = new DataInputStream(mySocket.getInputStream())) {
+    try (Socket mySocket = new Socket(InetAddress.getLocalHost(), 5013);
+         DataOutputStream myDataOutStream = new DataOutputStream(mySocket.getOutputStream());
+         DataInputStream myDataInStream = new DataInputStream(mySocket.getInputStream())) {
 
-            String userName = userNameTextFiled.getText();
-            String password = passwordTextField.getText();
-            
+        String userName = userNameTextFiled.getText();
+        String password = passwordTextField.getText();
 
-            if (userName.isEmpty() || password.isEmpty()) 
-            {
-            userNameTextFiled.clear();
-            passwordTextField.clear();
-            userNameTextFiled.setPromptText("Please fill out this field");
-            passwordTextField.setPromptText("Please fill out this field");
-            } 
-            else {
-            
+        if (userName.isEmpty() || password.isEmpty()) {
+            Platform.runLater(() -> {
+                userNameTextFiled.clear();
+                passwordTextField.clear();
+                userNameTextFiled.setPromptText("Please fill out this field");
+                passwordTextField.setPromptText("Please fill out this field");
+            });
+        } else {
             myDataOutStream.writeUTF("Login");
             myDataOutStream.writeUTF(userName);
             myDataOutStream.writeUTF(password);
 
             String message = myDataInStream.readUTF();
-            
-            switch (message) {
-                case "Logged in successfully":
-                    System.out.println("Login successful");
-                    
-                    break;
-                case "Password is incorrect":
-                    createTextValidation(passwordTextField, "Password is incorrect");
-                    break;
-                case "UserName is incorrect":
-                    createTextValidation(userNameTextFiled, "Username is incorrect");
-                    break;
-                case "This UserName is already signed-in":
-                    createTextValidation(userNameTextFiled, "This UserName is already signed in");
-                    break;
-                default:
-                    System.out.println("Unknown response from server: " + message);
-                    break;
-            }
-            }
-
-        } catch (IOException e) {
-            Logger.getLogger(LogIn.class.getName()).log(Level.SEVERE, null, e);
+            Platform.runLater(() -> {
+                Stage primaryStage = new Stage();
+                switch (message) {
+                    case "Logged in successfully":
+                        System.out.println("Login successful");
+                        playGameBase root = new playGameBase();
+                        Scene scene = new Scene(root);
+                        primaryStage.setScene(scene);
+                        primaryStage.setTitle("XO Game");
+                        primaryStage.show();
+                        break;
+                    case "Password is incorrect":
+                        createTextValidation(passwordTextField, "Password is incorrect");
+                        break;
+                    case "UserName is incorrect":
+                        createTextValidation(userNameTextFiled, "Username is incorrect");
+                        break;
+                    case "This UserName is already signed-in":
+                        createTextValidation(userNameTextFiled, "This UserName is already signed in");
+                        break;
+                    default:
+                        System.out.println("Unknown response from server: " + message);
+                        break;
+                }
+            });
         }
+    } catch (ConnectException e) {
+        System.err.println("Unable to connect to the server. Please ensure the server is running and accessible.");
+    } catch (IOException e) {
+        Logger.getLogger(LogIn.class.getName()).log(Level.SEVERE, null, e);
     }
+}
+    
+    
 
     private Text createLabel(int row, int col, String label) {
         Text text = new Text();

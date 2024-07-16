@@ -38,4 +38,8 @@ public class VideoPalyer extends Application {
     public void start(Stage primaryStage) throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    public void play(String winVideoPath) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

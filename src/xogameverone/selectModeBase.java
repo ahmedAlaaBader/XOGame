@@ -84,6 +84,9 @@ public class selectModeBase extends AnchorPane
         getChildren().add(buttonContainer);
         this.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
         this.getStyleClass().add("background");
+
+        String soundFilePath = "file:///D:/iti/Project/client/src/Sounds/epic-hybrid-logo-157092.mp3";
+
         Sound_Player.SoundPlayer.playSound(soundFilePath);
      }
     
