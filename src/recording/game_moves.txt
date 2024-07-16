@@ -1,0 +1,24 @@
+O: Row 1, Column 1
+
+X: Row 1, Column 0
+
+O: Row 2, Column 0
+
+X: Row 2, Column 1
+
+O: Row 0, Column 0
+
+X: Row 0, Column 1
+
+O: Row 2, Column 2
+
+O1,0
+
+O2,0
+
+O2,2
+
+O1,2
+
+O1,0
+

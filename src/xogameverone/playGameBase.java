@@ -1,10 +1,21 @@
 package xogameverone;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import static java.lang.Thread.sleep;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -57,9 +68,12 @@ public  class playGameBase extends BorderPane {
     VideoPalyer playVideo = new VideoPalyer();
     String winVideoPath = "file:///D:/iti/Project/client/src/videos/loseVideo.mp4";
     String loseVideoPath = "file:///D:/iti/Project/client/src/videos/winnerVideo.mp4";
-    
+    String sound = "file:///D:/iti/Project/client/src/Sounds/ui-click-43196.mp3";
   
     private static final Random random = new Random();
+    private final List<String> recordedMoves = new ArrayList<>();
+    private List<String> recordedMovess = new ArrayList<>();
+    private int replayIndex = 0;
    
     
     public playGameBase() {
@@ -141,34 +155,41 @@ public  class playGameBase extends BorderPane {
         rowConstraints1.setVgrow(javafx.scene.layout.Priority.SOMETIMES);
 
         handleButtonProperties(btn00);
+        GridPane.setColumnIndex(btn00, 0);
+        GridPane.setRowIndex(btn00, 0);
 
         GridPane.setColumnIndex(btn10, 1);
+        GridPane.setRowIndex(btn10, 0);
         handleButtonProperties(btn10);
 
         GridPane.setColumnIndex(btn20, 2);
+        GridPane.setRowIndex(btn20, 0);
         handleButtonProperties(btn20);
 
+        GridPane.setColumnIndex(btn01, 0);
         GridPane.setRowIndex(btn01, 1);
-         handleButtonProperties(btn01);
+        handleButtonProperties(btn01);
 
         GridPane.setColumnIndex(btn11, 1);
         GridPane.setRowIndex(btn11, 1);
-         handleButtonProperties(btn11);
+        handleButtonProperties(btn11);
 
         GridPane.setColumnIndex(btn21, 2);
         GridPane.setRowIndex(btn21, 1);
-         handleButtonProperties(btn21);
+        handleButtonProperties(btn21);
 
+        GridPane.setColumnIndex(btn02, 0);
         GridPane.setRowIndex(btn02, 2);
-         handleButtonProperties(btn02);
+        handleButtonProperties(btn02);
 
         GridPane.setColumnIndex(btn12, 1);
         GridPane.setRowIndex(btn12, 2);
-         handleButtonProperties(btn12);
+        handleButtonProperties(btn12);
 
         GridPane.setColumnIndex(btn22, 2);
         GridPane.setRowIndex(btn22, 2);
-         handleButtonProperties(btn22);
+        handleButtonProperties(btn22);
+
          
         setCenter(gridPane);
 
@@ -284,7 +305,6 @@ public  class playGameBase extends BorderPane {
         gridPane0.getChildren().add(oScoreTxt);
         this.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
         
-
     }
     private void handleButtonProperties(Button button)
     {
@@ -299,6 +319,7 @@ public  class playGameBase extends BorderPane {
             switch (selectModeBase.selectMode) {
                 case "Two players" :  
                     handlePlayerMove(button);
+                    
                     break;
                 case "Easy":  
                     handlePlayerMove(button);
@@ -309,6 +330,7 @@ public  class playGameBase extends BorderPane {
                     } else if (winner != null && "X".equals(currentPlayer)) {
                         displayLoser("you lose :(", loseVideoPath);
                         resetBoard();
+                        playRecordedGame();
                     } else if (counter == 9) {
                         displayDraw("no winner it's draw");
                     }
@@ -340,18 +362,25 @@ public  class playGameBase extends BorderPane {
         stage.setScene(selectModeScene);
         stage.show();
     }//will be at interface later
+    
     private void handlePlayerMove(Button button) {
+        
         if (button.getText().isEmpty()) {
+            Sound_Player.SoundPlayer.playSound(sound);
             button.setText(currentPlayer);
             currentPlayer = ("X".equals(currentPlayer)) ? "O" : "X";
+             recordMove(button);
             counter++;
             String winner = checkWinner();
             if (winner != null) {
                 displayWinner(winner, winVideoPath);
             } else if (counter == 9) {
+                
                 displayDraw("no winner it's draw");
             }
         }
+        
+        
     }
 
     private void computerMove() {
@@ -423,6 +452,10 @@ public  class playGameBase extends BorderPane {
     }
 
     private void resetBoard() {
+
+        // Clear the recorded moves
+        recordedMoves.clear();
+        
         currentPlayer = "X";
         counter = 0;
         for (int i = 0; i < 3; i++) {
@@ -555,5 +588,72 @@ public  class playGameBase extends BorderPane {
 
     return "";
 }
+   private void recordMove(Button button) {
+        Integer row = GridPane.getRowIndex(button);
+        Integer col = GridPane.getColumnIndex(button);
+
+            try (
+                BufferedWriter writer = new BufferedWriter(new FileWriter("D:\\iti\\Project\\client\\src\\recording\\game_moves.txt", true))) {
+                String move = currentPlayer +row + "," + col + "\n";
+                writer.write(move);
+                writer.newLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    }
+   
+   private void saveRecordedMovesToFile() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("D:\\iti\\Project\\client\\src\\recording\\game_moves.txt"))) {
+            for (String move : recordedMoves) {
+                writer.write(move);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+   
+   private List<String> loadRecordedMovesFromFile() {
+    List<String> moves = new ArrayList<>();
+    try (BufferedReader reader = new BufferedReader(new FileReader("D:\\iti\\Project\\client\\src\\recording\\game_moves.txt"))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+            moves.add(line);
+        }
+        
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    return moves;
+}
+
+    private void playRecordedGame() {
+    recordedMovess = loadRecordedMovesFromFile();
+    replayIndex = 0;
+    replayRecordedMove();
+}
+
+    private void replayRecordedMove() {
+        if (replayIndex < recordedMovess.size()) {
+            String move = recordedMovess.get(replayIndex);
+            if (move.equals("X wins") || move.equals("O wins") || move.equals("draw")) {
+                // Handle game end states
+                return;
+            }
+
+            System.out.println("Index: " + replayIndex + ", Array Length: " + recordedMovess.size());
+            String[] parts = move.split(",");
+            String player = parts[0];
+            int row = Integer.parseInt(parts[2]);
+            int col = Integer.parseInt(parts[4]);
+
+            // Update the button text based on the recorded move
+            btn[row][col].setText(player);
+            replayIndex++;
+
+            replayRecordedMove();
+        }
+    }
 
 }

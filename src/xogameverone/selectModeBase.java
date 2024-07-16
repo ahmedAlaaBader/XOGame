@@ -29,6 +29,7 @@ public class selectModeBase extends AnchorPane
     private static final double BUTTON_FONT_SIZE = 20.0;
     private static final String BUTTON_FONT_STYLE = "System Italic";
     private static final String BACKGROUND_IMAGE_PATH = "/images/background.jfif";
+    private static final String soundFilePath = "file:/D:/iti/Project/client/src/Sounds/wrong-place-129242.mp3";
 
     public selectModeBase()
     {
@@ -83,7 +84,6 @@ public class selectModeBase extends AnchorPane
         getChildren().add(buttonContainer);
         this.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
         this.getStyleClass().add("background");
-        String soundFilePath = "file:/D:/iti/Project/client/src/Sounds/wrong-place-129242.mp3";
         Sound_Player.SoundPlayer.playSound(soundFilePath);
      }
     
