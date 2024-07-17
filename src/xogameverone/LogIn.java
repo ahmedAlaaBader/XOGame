@@ -25,6 +25,7 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.Parent;
+import javafx.scene.layout.StackPane;
 
 public class LogIn extends AnchorPane {
 
@@ -87,9 +88,10 @@ public class LogIn extends AnchorPane {
 
         logIn = createButton(306.0, "Login");
         logIn.setOnAction(this::handleLogin);
-
+logIn.setOnAction(this::goToActivePlayersBase);
         signUp = createButton(354.0, "Sign Up");
         signUp.setOnAction(this::goToSignUpPage);
+        
 
         dropShadow0.setHeight(72.4);
         dropShadow0.setRadius(31.25);
@@ -147,10 +149,22 @@ public class LogIn extends AnchorPane {
         
         Parent signUpPage = new SignUp();
         Scene selectModeScene = new Scene(signUpPage);
-        // Get the current stage
         Stage stage = (Stage) ((Button) ev.getSource()).getScene().getWindow();
         stage.setScene(selectModeScene);
         stage.show();
+    }
+    private void goToActivePlayersBase(ActionEvent ev) {
+        try {
+            Parent activePlayersBase = new ActivePlayersBase();
+             Scene selectModeScene = new Scene(activePlayersBase);
+            Stage stage = (Stage) ((Button) ev.getSource()).getScene().getWindow();
+           stage.setScene(selectModeScene);
+            stage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(LogIn.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+       
     }
 
     private void handleLogin(ActionEvent event) {
