@@ -20,6 +20,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
 public class ActivePlayersBase extends AnchorPane {
 
@@ -138,6 +139,7 @@ public class ActivePlayersBase extends AnchorPane {
             }
         });
         
+        
 
         activePlayersButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -176,6 +178,21 @@ public class ActivePlayersBase extends AnchorPane {
     });
 });
 
+cancelButton.setOnAction(event -> {
+    if (cancelButton.getText().equals("Declined")) {
+        showAlert("Game Declined", "The sender has declined the game.");
+    }
+});
+
+sendRequestButton.setOnAction(event -> {
+   if (sendRequestButton.getText().equals("Accept")) {
+        openGamePage(primaryStage);
+    }
+});
+
+
+
+
       
         InetAddress serverAddress = InetAddress.getLocalHost();
         Socket socket = new Socket(serverAddress, 5013);
@@ -195,15 +212,15 @@ public class ActivePlayersBase extends AnchorPane {
         String requestResponse = input.readUTF();
         System.out.println("Request response: " + requestResponse);
 
-        socket.close();
-    }
+        socket.close();}
+
+ private void showAlert(String title, String message) {
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    alert.setTitle(title);
+    alert.setHeaderText(null); 
+    alert.setContentText(message); 
+    alert.showAndWait();
 }
-/*
-acceptButton.setOnAction(event -> {
-         
-            openGamePage(primaryStage);
-        });
-declineButton.setOnAction(event -> {
-            showAlert("Game Declined", "The sender has declined the game.");
-        });
-*/
+}
+    
+
