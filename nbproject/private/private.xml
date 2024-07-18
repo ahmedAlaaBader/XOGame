@@ -3,20 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-<<<<<<< HEAD
             <file>file:/D:/iti/Project/client/src/xogameverone/playGameBase.java</file>
             <file>file:/D:/iti/Project/client/src/xogameverone/SignUp.java</file>
+            <file>file:/D:/iti/Project/client/src/Sound_Player/SoundPlayer.java</file>
             <file>file:/D:/iti/Project/client/src/xogameverone/selectModeBase.java</file>
             <file>file:/D:/iti/Project/client/src/xogameverone/XOGameVerOne.java</file>
             <file>file:/D:/iti/Project/client/src/xogameverone/LogIn.java</file>
-=======
-            <file>file:/F:/java%20labs/simi%20final/client/XOGame/src/xogameverone/SignUp.java</file>
-            <file>file:/F:/java%20labs/simi%20final/client/XOGame/src/xogameverone/playGameBase.java</file>
-            <file>file:/F:/java%20labs/simi%20final/client/XOGame/src/xogameverone/LogIn.java</file>
-            <file>file:/F:/java%20labs/simi%20final/client/XOGame/src/xogameverone/XOGameVerOne.java</file>
-            <file>file:/F:/java%20labs/simi%20final/client/XOGame/src/xogameverone/selectModeBase.java</file>
-            <file>file:/F:/java%20labs/simi%20final/client/XOGame/src/xogameverone/singlePlayerModeBase.java</file>
->>>>>>> a024e417f0e77b671f5f48540ca0c245c1d0548d
         </group>
     </open-files>
 </project-private>

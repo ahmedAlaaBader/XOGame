@@ -337,7 +337,7 @@ public  class playGameBase extends BorderPane {
             switch (selectModeBase.selectMode) {
                 case "Two players" :  
                     handlePlayerMove(button);
-                    playRecordedGame();
+                    //playRecordedGame();
                     break;
                 case "Easy":  
                     handlePlayerMove(button);
@@ -373,12 +373,13 @@ public  class playGameBase extends BorderPane {
     }
     private void handleExitButtonAction(ActionEvent event) 
     {
-        Parent selectModeBase = new selectModeBase();
-        Scene selectModeScene = new Scene(selectModeBase);
-        // Get the current stage
-        Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        stage.setScene(selectModeScene);
-        stage.show();
+        playRecordedGame();
+//        Parent selectModeBase = new selectModeBase();
+//        Scene selectModeScene = new Scene(selectModeBase);
+//        // Get the current stage
+//        Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+//        stage.setScene(selectModeScene);
+//        stage.show();
     }//will be at interface later
     
     public  void handlePlayerMove(Button button) {
@@ -612,7 +613,7 @@ public  class playGameBase extends BorderPane {
 
             try (
                 BufferedWriter writer = new BufferedWriter(new FileWriter("D:\\iti\\Project\\client\\src\\recording\\game_moves.txt", true))) {
-                String move = currentPlayer +"," + row + "," + col + "\n";
+                String move = currentPlayer +"," + row + "," + col;
                 writer.write(move);
                 writer.newLine();
             } catch (IOException e) {
@@ -652,26 +653,33 @@ public  class playGameBase extends BorderPane {
     replayRecordedMove();
 }
 
-    private void replayRecordedMove() {
-        if (replayIndex < recordedMovess.size()) {
-            String move = recordedMovess.get(replayIndex);
-            if (move.equals("X wins") || move.equals("O wins") || move.equals("draw")) {
-                // Handle game end states
-                return;
-            }
-
-            System.out.println("Index: " + replayIndex + ", Array Length: " + recordedMovess.size());
-            String[] parts = move.split(",");
-            String player = parts[0];
-            int row = Integer.parseInt(parts[2]);
-            int col = Integer.parseInt(parts[4]);
-
-            // Update the button text based on the recorded move
-            btn[row][col].setText(player);
-            replayIndex++;
-
-            replayRecordedMove();
+   private void replayRecordedMove() {
+   while (replayIndex < recordedMovess.size()) {
+        String move = recordedMovess.get(replayIndex);
+        if (move.equals("X wins") || move.equals("O wins") || move.equals("draw")) {
+            // Handle game end states
+            return;
         }
+
+        System.out.println("Index: " + replayIndex + ", Array Length: " + recordedMovess.size());
+        String[] parts = move.split(",");
+        if (parts.length != 3) {
+            System.err.println("Invalid move format: " + move);
+            return;
+        }
+
+        String player = parts[0];
+        int row = Integer.parseInt(parts[1]);
+        int col = Integer.parseInt(parts[2]);
+        System.out.println(row + " " + col);
+
+        // Update the button text based on the recorded move
+        btn[row][col].setText(player);
+        replayIndex++;
+
+        // Delay before the next move to simulate real-time playback
+       
     }
+}
 
 }
