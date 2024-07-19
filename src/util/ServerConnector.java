@@ -11,11 +11,13 @@ import java.util.logging.Logger;
 public class ServerConnector {
     private static ServerConnector connector;
 
+    private Socket serverSocket;
     private DataInputStream serverReader;
     private DataOutputStream serverWriter;
 
     private ServerConnector() {
-        try (Socket serverSocket = new Socket(InetAddress.getLocalHost(), 5013)) {
+        try {
+            serverSocket = new Socket(InetAddress.getLocalHost(), 5013);
             serverReader = new DataInputStream(serverSocket.getInputStream());
             serverWriter = new DataOutputStream(serverSocket.getOutputStream());
         } catch (IOException exception) {
@@ -32,6 +34,7 @@ public class ServerConnector {
     }
 
     public String authenticate(String username, String password) {
+        System.out.println("Authenticate -> username: " + username);
         String serverResponse = null;
 
         try {
@@ -44,6 +47,7 @@ public class ServerConnector {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, exception);
         }
 
+        System.out.println("Server Response: " + serverResponse);
         return serverResponse;
     }
 
@@ -65,5 +69,29 @@ public class ServerConnector {
         }
 
         return move;
+    }
+
+    public String receiveStatus() {
+        String status = null;
+
+        try {
+            status = serverReader.readUTF();
+        } catch (IOException exception) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, exception);
+        }
+
+        return status;
+    }
+    
+    public String receiveInitialPlayer() {
+        String player = null;
+
+        try {
+            player = serverReader.readUTF();
+        } catch (IOException exception) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, exception);
+        }
+
+        return player;
     }
 }

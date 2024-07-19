@@ -161,7 +161,7 @@ public class LogIn extends AnchorPane {
             switch (message) {
                 case "Logged in successfully":
                     //System.out.println("Server Response: " + message);
-                    LogIn root = new LogIn();
+                    playGameBase root = new playGameBase();
                     Scene scene = new Scene(root);
                     s.setScene(scene);
                     s.setTitle("XO Game");

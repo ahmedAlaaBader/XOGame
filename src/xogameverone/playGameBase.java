@@ -20,8 +20,8 @@ import javafx.stage.Stage;
 import util.ServerConnector;
 import video_palyer.VideoPalyer;
 
-public  class playGameBase extends BorderPane {
-    
+public class playGameBase extends BorderPane {
+
     protected final GridPane gridPane;
     protected final ColumnConstraints columnConstraints;
     protected final ColumnConstraints columnConstraints0;
@@ -52,20 +52,17 @@ public  class playGameBase extends BorderPane {
     protected final Text oScoreTxt;
     protected final Button exitBtn;
     protected final ColorAdjust colorAdjust;
-    private String currentPlayer = "X"; 
+    private String currentPlayer = "X";
     private final Button[][] btn;
     private int counter = 0;
     VideoPalyer playVideo = new VideoPalyer();
     String winVideoPath = "file:///D:/iti/Project/client/src/videos/loseVideo.mp4";
     String loseVideoPath = "file:///D:/iti/Project/client/src/videos/winnerVideo.mp4";
-    String [][] onlineMovement;
+    String[][] onlineMovement;
     String move;
-    
-  
+
     private static final Random random = new Random();
-    
-   
-    
+
     public playGameBase() {
 
         gridPane = new GridPane();
@@ -99,12 +96,12 @@ public  class playGameBase extends BorderPane {
         exitBtn = new Button();
         colorAdjust = new ColorAdjust();
 
-        btn = new Button[][] {
+        btn = new Button[][]{
             {btn00, btn01, btn02},
             {btn10, btn11, btn12},
             {btn20, btn21, btn22}
         };
-        
+
         setMaxHeight(USE_PREF_SIZE);
         setMaxWidth(USE_PREF_SIZE);
         setMinHeight(USE_PREF_SIZE);
@@ -153,27 +150,27 @@ public  class playGameBase extends BorderPane {
         handleButtonProperties(btn20);
 
         GridPane.setRowIndex(btn01, 1);
-         handleButtonProperties(btn01);
+        handleButtonProperties(btn01);
 
         GridPane.setColumnIndex(btn11, 1);
         GridPane.setRowIndex(btn11, 1);
-         handleButtonProperties(btn11);
+        handleButtonProperties(btn11);
 
         GridPane.setColumnIndex(btn21, 2);
         GridPane.setRowIndex(btn21, 1);
-         handleButtonProperties(btn21);
+        handleButtonProperties(btn21);
 
         GridPane.setRowIndex(btn02, 2);
-         handleButtonProperties(btn02);
+        handleButtonProperties(btn02);
 
         GridPane.setColumnIndex(btn12, 1);
         GridPane.setRowIndex(btn12, 2);
-         handleButtonProperties(btn12);
+        handleButtonProperties(btn12);
 
         GridPane.setColumnIndex(btn22, 2);
         GridPane.setRowIndex(btn22, 2);
-         handleButtonProperties(btn22);
-         
+        handleButtonProperties(btn22);
+
         setCenter(gridPane);
 
         BorderPane.setAlignment(gridPane0, javafx.geometry.Pos.CENTER);
@@ -257,7 +254,6 @@ public  class playGameBase extends BorderPane {
         exitBtn.setOnAction(this::handleExitButtonAction);
         exitBtn.getStyleClass().add("custom-button");
 
-      
         setBottom(exitBtn);
 
         gridPane.getColumnConstraints().add(columnConstraints);
@@ -287,12 +283,12 @@ public  class playGameBase extends BorderPane {
         gridPane0.getChildren().add(xScoreTxt);
         gridPane0.getChildren().add(oScoreTxt);
         this.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
-        
-        
 
+        this.currentPlayer = ServerConnector.connect().receiveInitialPlayer();
+        System.out.println("Inital Player: " + this.currentPlayer);
     }
-    private void handleButtonProperties(Button button)
-    {
+
+    private void handleButtonProperties(Button button) {
         button.setBlendMode(javafx.scene.effect.BlendMode.COLOR_DODGE);
         button.setMnemonicParsing(false);
         button.setPrefHeight(75.0);
@@ -301,14 +297,14 @@ public  class playGameBase extends BorderPane {
         button.setCursor(Cursor.HAND);
         button.getStyleClass().add("game-button");
         button.setOnMouseClicked((MouseEvent event) -> {
+            System.out.println(selectModeBase.selectMode);
             switch (selectModeBase.selectMode) {
                 case "Two players":
-                    playMoveOnline(button);
-                    receiveMoveOnline();
-                    break;
-                case "Easy":  
                     handlePlayerMove(button);
-                    computerMove(); 
+                    break;
+                case "Easy":
+                    handlePlayerMove(button);
+                    computerMove();
                     String winner = checkWinner();
                     if (winner != null && "O".equals(currentPlayer)) {
                         displayVideo(winVideoPath);
@@ -319,10 +315,10 @@ public  class playGameBase extends BorderPane {
                         displayDraw("no winner it's draw");
                     }
                     break;
-                    
-                     case "Hard":  
+
+                case "Hard":
                     handlePlayerMove(button);
-                    computerMoveHard(); 
+                    computerMoveHard();
                     String winn = checkWinner();
                     if (winn != null && "O".equals(currentPlayer)) {
                         displayVideo(winVideoPath);
@@ -333,12 +329,17 @@ public  class playGameBase extends BorderPane {
                         displayDraw("no winner it's draw");
                     }
                     break;
+                default:
+                    playMoveOnline(button);
+                    this.currentPlayer = "X".equals(this.currentPlayer) ? "O" : "X";
+                    receiveGameStatus();
+                    break;
             }
         });
-        
+
     }
-    private void handleExitButtonAction(ActionEvent event) 
-    {
+
+    private void handleExitButtonAction(ActionEvent event) {
         Parent selectModeBase = new selectModeBase();
         Scene selectModeScene = new Scene(selectModeBase);
         // Get the current stage
@@ -346,6 +347,7 @@ public  class playGameBase extends BorderPane {
         stage.setScene(selectModeScene);
         stage.show();
     }//will be at interface later
+
     private void handlePlayerMove(Button button) {
         if (button.getText().isEmpty()) {
             button.setText(currentPlayer);
@@ -353,7 +355,7 @@ public  class playGameBase extends BorderPane {
             counter++;
             String winner = checkWinner();
             if (winner != null) {
-               // displayWinner(winner, winVideoPath);
+                // displayWinner(winner, winVideoPath);
             } else if (counter == 9) {
                 displayDraw("no winner it's draw");
             }
@@ -378,29 +380,29 @@ public  class playGameBase extends BorderPane {
 
     private String checkWinner() {
         for (int i = 0; i < 3; i++) {
-            if (!btn[i][0].getText().isEmpty() &&
-                btn[i][0].getText().equals(btn[i][1].getText()) &&
-                btn[i][0].getText().equals(btn[i][2].getText())) {
+            if (!btn[i][0].getText().isEmpty()
+                    && btn[i][0].getText().equals(btn[i][1].getText())
+                    && btn[i][0].getText().equals(btn[i][2].getText())) {
                 return btn[i][0].getText();
             }
         }
 
         for (int i = 0; i < 3; i++) {
-            if (!btn[0][i].getText().isEmpty() &&
-                btn[0][i].getText().equals(btn[1][i].getText()) &&
-                btn[0][i].getText().equals(btn[2][i].getText())) {
+            if (!btn[0][i].getText().isEmpty()
+                    && btn[0][i].getText().equals(btn[1][i].getText())
+                    && btn[0][i].getText().equals(btn[2][i].getText())) {
                 return btn[0][i].getText();
             }
         }
 
-        if (!btn[0][0].getText().isEmpty() &&
-            btn[0][0].getText().equals(btn[1][1].getText()) &&
-            btn[0][0].getText().equals(btn[2][2].getText())) {
+        if (!btn[0][0].getText().isEmpty()
+                && btn[0][0].getText().equals(btn[1][1].getText())
+                && btn[0][0].getText().equals(btn[2][2].getText())) {
             return btn[0][0].getText();
         }
-        if (!btn[0][2].getText().isEmpty() &&
-            btn[0][2].getText().equals(btn[1][1].getText()) &&
-            btn[0][2].getText().equals(btn[2][0].getText())) {
+        if (!btn[0][2].getText().isEmpty()
+                && btn[0][2].getText().equals(btn[1][1].getText())
+                && btn[0][2].getText().equals(btn[2][0].getText())) {
             return btn[0][2].getText();
         }
 
@@ -420,7 +422,7 @@ public  class playGameBase extends BorderPane {
     }
 
     private void displayVideo(String path) {
-        playVideo.playVideo(path);   
+        playVideo.playVideo(path);
     }
 
     private void displayDraw(String message) {
@@ -437,153 +439,145 @@ public  class playGameBase extends BorderPane {
             }
         }
     }
-    
-    
+
     private void computerMoveHard() {
-    int[] bestMove = findBestMove();
-    btn[bestMove[0]][bestMove[1]].setText("O");
-    currentPlayer = "X";
-    counter++;
-}
-
-   private int[] findBestMove() {
-    int bestVal = Integer.MIN_VALUE;
-    int[] bestMove = new int[2];
-    bestMove[0] = -1;
-    bestMove[1] = -1;
-
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            if (btn[i][j].getText().equals("")) {
-                btn[i][j].setText("O");
-                int moveVal = minimax(0, false);
-                btn[i][j].setText("");
-
-                if (moveVal > bestVal) {
-                    bestMove[0] = i;
-                    bestMove[1] = j;
-                    bestVal = moveVal;
-                }
-            }
-        }
-    }
-    return bestMove;
-}
-
-   private int minimax(int depth, boolean isMax) {
-    String score = evaluate();
-    if (score.equals("O")) {
-        return 10 - depth;
-    }
-    if (score.equals("X")) {
-        return depth - 10;
-    }
-    if (isMovesLeft() == false) {
-        return 0;
+        int[] bestMove = findBestMove();
+        btn[bestMove[0]][bestMove[1]].setText("O");
+        currentPlayer = "X";
+        counter++;
     }
 
-    if (isMax) {
-        int best = Integer.MIN_VALUE;
+    private int[] findBestMove() {
+        int bestVal = Integer.MIN_VALUE;
+        int[] bestMove = new int[2];
+        bestMove[0] = -1;
+        bestMove[1] = -1;
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (btn[i][j].getText().equals("")) {
                     btn[i][j].setText("O");
-                    best = Math.max(best, minimax(depth + 1, false));
+                    int moveVal = minimax(0, false);
                     btn[i][j].setText("");
+
+                    if (moveVal > bestVal) {
+                        bestMove[0] = i;
+                        bestMove[1] = j;
+                        bestVal = moveVal;
+                    }
                 }
             }
         }
-        return best;
-    } else {
-        int best = Integer.MAX_VALUE;
+        return bestMove;
+    }
 
+    private int minimax(int depth, boolean isMax) {
+        String score = evaluate();
+        if (score.equals("O")) {
+            return 10 - depth;
+        }
+        if (score.equals("X")) {
+            return depth - 10;
+        }
+        if (isMovesLeft() == false) {
+            return 0;
+        }
+
+        if (isMax) {
+            int best = Integer.MIN_VALUE;
+
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (btn[i][j].getText().equals("")) {
+                        btn[i][j].setText("O");
+                        best = Math.max(best, minimax(depth + 1, false));
+                        btn[i][j].setText("");
+                    }
+                }
+            }
+            return best;
+        } else {
+            int best = Integer.MAX_VALUE;
+
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (btn[i][j].getText().equals("")) {
+                        btn[i][j].setText("X");
+                        best = Math.min(best, minimax(depth + 1, true));
+                        btn[i][j].setText("");
+                    }
+                }
+            }
+            return best;
+        }
+    }
+
+    private boolean isMovesLeft() {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (btn[i][j].getText().equals("")) {
-                    btn[i][j].setText("X");
-                    best = Math.min(best, minimax(depth + 1, true));
-                    btn[i][j].setText("");
+                    return true;
                 }
             }
         }
-        return best;
+        return false;
     }
-}
 
-   private boolean isMovesLeft() {
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            if (btn[i][j].getText().equals("")) {
-                return true;
+    private String evaluate() {
+        for (int row = 0; row < 3; row++) {
+            if (btn[row][0].getText().equals(btn[row][1].getText()) && btn[row][1].getText().equals(btn[row][2].getText())) {
+                if (btn[row][0].getText().equals("O")) {
+                    return "O";
+                } else if (btn[row][0].getText().equals("X")) {
+                    return "X";
+                }
             }
         }
-    }
-    return false;
-}
 
-   private String evaluate() {
-    for (int row = 0; row < 3; row++) {
-        if (btn[row][0].getText().equals(btn[row][1].getText()) && btn[row][1].getText().equals(btn[row][2].getText())) {
-            if (btn[row][0].getText().equals("O")) {
+        for (int col = 0; col < 3; col++) {
+            if (btn[0][col].getText().equals(btn[1][col].getText()) && btn[1][col].getText().equals(btn[2][col].getText())) {
+                if (btn[0][col].getText().equals("O")) {
+                    return "O";
+                } else if (btn[0][col].getText().equals("X")) {
+                    return "X";
+                }
+            }
+        }
+
+        if (btn[0][0].getText().equals(btn[1][1].getText()) && btn[1][1].getText().equals(btn[2][2].getText())) {
+            if (btn[0][0].getText().equals("O")) {
                 return "O";
-            } else if (btn[row][0].getText().equals("X")) {
+            } else if (btn[0][0].getText().equals("X")) {
                 return "X";
             }
         }
-    }
 
-    for (int col = 0; col < 3; col++) {
-        if (btn[0][col].getText().equals(btn[1][col].getText()) && btn[1][col].getText().equals(btn[2][col].getText())) {
-            if (btn[0][col].getText().equals("O")) {
+        if (btn[0][2].getText().equals(btn[1][1].getText()) && btn[1][1].getText().equals(btn[2][0].getText())) {
+            if (btn[0][2].getText().equals("O")) {
                 return "O";
-            } else if (btn[0][col].getText().equals("X")) {
+            } else if (btn[0][2].getText().equals("X")) {
                 return "X";
             }
         }
+
+        return "";
     }
 
-    if (btn[0][0].getText().equals(btn[1][1].getText()) && btn[1][1].getText().equals(btn[2][2].getText())) {
-        if (btn[0][0].getText().equals("O")) {
-            return "O";
-        } else if (btn[0][0].getText().equals("X")) {
-            return "X";
-        }
-    }
+    private void receiveGameStatus() {
+        String gameStatus = ServerConnector.connect().receiveStatus();
 
-    if (btn[0][2].getText().equals(btn[1][1].getText()) && btn[1][1].getText().equals(btn[2][0].getText())) {
-        if (btn[0][2].getText().equals("O")) {
-            return "O";
-        } else if (btn[0][2].getText().equals("X")) {
-            return "X";
-        }
-    }
-
-    return "";
-}
-   
-   private void receiveMoveOnline() {
-        String componentMove = ServerConnector.connect().receiveMove();
-
-        if (componentMove == "Winner") {
-            //handle winning
-        } else if (componentMove == "Loser") {
-            //handle lose
-        } else if (componentMove == "Draw") {
-            //handle draw
-        } else {
-            String[] moveTokens = componentMove.split(",");
-            String row = moveTokens[0];
-            String column = moveTokens[1];
-            String simple = moveTokens[2];
-            
-            //draw simple on 
+        if ("Winner X".equals(gameStatus)) {
+            System.out.println("X Won");
+        } else if ("Winner O".equals(gameStatus)) {
+            System.out.println("O Won");
+        } else if ("Draw".equals(gameStatus)) {
+            System.out.println("Draw");
         }
     }
 
     private void playMoveOnline(Button boardPiece) {
         if (boardPiece.getText().isEmpty()) {
-            boardPiece.setText(currentPlayer);
+            boardPiece.setText(this.currentPlayer);
 
             String move = getMovement(boardPiece);
             ServerConnector.connect().sendMove(move);
@@ -591,12 +585,42 @@ public  class playGameBase extends BorderPane {
     }
 
     public String getMovement(Button button) {
-        int row = GridPane.getRowIndex(button);
-        int column = GridPane.getColumnIndex(button);
+        int row = 0;
+        int column = 0;
+
+        if (button == btn00) {
+            row = 0;
+            column = 0;
+        } else if (button == btn01) {
+            row = 0;
+            column = 1;
+        } else if (button == btn02) {
+            row = 0;
+            column = 2;
+        } else if (button == btn10) {
+            row = 1;
+            column = 0;
+        } else if (button == btn11) {
+            row = 1;
+            column = 1;
+        } else if (button == btn12) {
+            row = 1;
+            column = 2;
+        } else if (button == btn20) {
+            row = 2;
+            column = 0;
+        } else if (button == btn21) {
+            row = 2;
+            column = 1;
+        } else if (button == btn22) {
+            row = 2;
+            column = 2;
+        }
+
         String btnTxt = button.getText();
 
         move = row + "," + column + "," + btnTxt;
-        System.out.print(move);
+        System.out.println(move);
 
         return move;
     }
