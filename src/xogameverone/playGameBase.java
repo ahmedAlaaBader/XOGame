@@ -68,9 +68,9 @@ public  class playGameBase extends BorderPane {
     private final Button[][] btn;
     private int counter = 0;
     VideoPalyer playVideo = new VideoPalyer();
-    String winVideoPath = "file:///D:/iti/Project/client/src/videos/loseVideo.mp4";
-    String loseVideoPath = "file:///D:/iti/Project/client/src/videos/winnerVideo.mp4";
-    String sound = "file:///D:/iti/Project/client/src/Sounds/ui-click-43196.mp3";
+    String winVideoPath = "file:///F:/project/client/src/videos/loseVideo.mp4";
+    String loseVideoPath = "file:///F:/project/client/src/videos/winnerVideo.mp4";
+    String sound = "file:///F:/project/clinet/src/Sounds/ui-click-43196.mp3";
   
     private static final Random random = new Random();
     private final List<String> recordedMoves = new ArrayList<>();
@@ -373,13 +373,12 @@ public  class playGameBase extends BorderPane {
     }
     private void handleExitButtonAction(ActionEvent event) 
     {
-        playRecordedGame();
-//        Parent selectModeBase = new selectModeBase();
-//        Scene selectModeScene = new Scene(selectModeBase);
-//        // Get the current stage
-//        Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-//        stage.setScene(selectModeScene);
-//        stage.show();
+        
+     Parent selectModeBase = new selectModeBase();
+        Scene selectModeScene = new Scene(selectModeBase);
+       // Get the current stage
+       Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+       stage.setScene(selectModeScene);        stage.show();
     }//will be at interface later
     
     public  void handlePlayerMove(Button button) {
@@ -612,7 +611,7 @@ public  class playGameBase extends BorderPane {
         Integer col = GridPane.getColumnIndex(button);
 
             try (
-                BufferedWriter writer = new BufferedWriter(new FileWriter("D:\\iti\\Project\\client\\src\\recording\\game_moves.txt", true))) {
+                BufferedWriter writer = new BufferedWriter(new FileWriter("F:\\project\\clinet\\src\\recording\\game_moves.txt", true))) {
                 String move = currentPlayer +"," + row + "," + col;
                 writer.write(move);
                 writer.newLine();
@@ -622,7 +621,7 @@ public  class playGameBase extends BorderPane {
     }
    
    private void saveRecordedMovesToFile() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("D:\\iti\\Project\\client\\src\\recording\\game_moves.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("F:\\project\\clinet\\src\\recording\\game_moves.txt"))) {
             for (String move : recordedMoves) {
                 writer.write(move);
                 writer.newLine();
@@ -635,7 +634,7 @@ public  class playGameBase extends BorderPane {
    
    private List<String> loadRecordedMovesFromFile() {
     List<String> moves = new ArrayList<>();
-    try (BufferedReader reader = new BufferedReader(new FileReader("D:\\iti\\Project\\client\\src\\recording\\game_moves.txt"))) {
+    try (BufferedReader reader = new BufferedReader(new FileReader("F:\\project\\clinet\\src\\recording\\game_moves.txt"))) {
         String line;
         while ((line = reader.readLine()) != null) {
             moves.add(line);

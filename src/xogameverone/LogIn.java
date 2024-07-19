@@ -88,7 +88,8 @@ public class LogIn extends AnchorPane {
         imageView1.setImage(new Image(getClass().getResource("/images/OIP-removebg-preview (1).png").toExternalForm()));
 
         logIn = createButton(306.0, "Login");
-        logIn.setOnAction(this::handleLogin);
+       logIn.setOnAction(this::goToActivePlayersBasePage);;
+       // logIn.setOnAction(this::handleLogin);
 
         signUp = createButton(354.0, "Sign Up");
         signUp.setOnAction(this::goToSignUpPage);
@@ -154,10 +155,25 @@ public class LogIn extends AnchorPane {
         stage.setScene(selectModeScene);
         stage.show();
     }
-
+private void goToActivePlayersBasePage(ActionEvent event) {
+        try {
+            // Create an instance of ActivePlayersBase
+            ActivePlayersBase activePlayersBasePage = new ActivePlayersBase();
+            
+            // Create a new scene with ActivePlayersBase
+            Scene selectModeScene = new Scene(activePlayersBasePage);
+            
+            // Get the current stage and set the new scene
+            Stage stage = (Stage) logIn.getScene().getWindow();
+            stage.setScene(selectModeScene);
+        } catch (Exception ex) {
+            ex.printStackTrace(); // Log the error if needed
+        }
+    }
     private void handleLogin(ActionEvent event) {
         new Thread(this::runClient).start();
     }
+   
 
     private void runClient() {
     try (Socket mySocket = new Socket(InetAddress.getLocalHost(), 5013);
