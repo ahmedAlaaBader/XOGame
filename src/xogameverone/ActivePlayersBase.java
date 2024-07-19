@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Cursor;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
@@ -35,17 +36,17 @@ public class ActivePlayersBase extends AnchorPane {
     protected final DropShadow dropShadow2;
     protected final VBox vBox;
     protected final ToggleGroup group1;
+    private static final double BUTTON_WIDTH = 150.0;
+    private static final double BUTTON_HEIGHT = 41.0;
 
     public ActivePlayersBase() throws IOException {
 
         imageView = new ImageView();
-        activePlayersButton = new ToggleButton();
         dropShadow = new DropShadow();
-        gameRequestbutton = new ToggleButton();
         dropShadow0 = new DropShadow();
-        sendRequestButton = new Button();
+       
         dropShadow1 = new DropShadow();
-        cancelButton = new Button();
+        
         dropShadow2 = new DropShadow();
         vBox = new VBox();
         group1 = new ToggleGroup();
@@ -63,51 +64,10 @@ public class ActivePlayersBase extends AnchorPane {
        imageView.setImage(new Image("/images/khlfia.png"));
 
 
-
-        activePlayersButton.setLayoutX(141.0);
-        activePlayersButton.setLayoutY(-5.0);
-        activePlayersButton.setMnemonicParsing(false);
-        activePlayersButton.setPrefHeight(41.0);
-        activePlayersButton.setPrefWidth(151.0);
-        activePlayersButton.setSelected(true);
-        activePlayersButton.setStyle("-fx-background-color: ivory; -fx-border-color: black;");
-        activePlayersButton.setText("Active Players");
-        activePlayersButton.setFont(new Font("System Bold Italic", 14.0));
-        dropShadow.setSpread(0.65);
-        activePlayersButton.setEffect(dropShadow);
-
-        gameRequestbutton.setLayoutX(292.0);
-        gameRequestbutton.setLayoutY(-5.0);
-        gameRequestbutton.setMnemonicParsing(false);
-        gameRequestbutton.setPrefHeight(41.0);
-        gameRequestbutton.setPrefWidth(160.0);
-        gameRequestbutton.setStyle("-fx-background-color: ivory; -fx-border-color: black;");
-        gameRequestbutton.setText("Game Requests");
-        gameRequestbutton.setFont(new Font("System Bold Italic", 14.0));
-        dropShadow0.setSpread(0.58);
-        gameRequestbutton.setEffect(dropShadow0);
-
-        sendRequestButton.setLayoutX(112.0);
-        sendRequestButton.setLayoutY(358.0);
-        sendRequestButton.setMnemonicParsing(false);
-        sendRequestButton.setPrefHeight(41.0);
-        sendRequestButton.setPrefWidth(190.0);
-        sendRequestButton.setStyle("-fx-background-color: gold;");
-        sendRequestButton.setText("Send Request");
-        sendRequestButton.setFont(new Font("System Bold Italic", 14.0));
-        dropShadow1.setSpread(0.36);
-        sendRequestButton.setEffect(dropShadow1);
-
-        cancelButton.setLayoutX(332.0);
-        cancelButton.setLayoutY(358.0);
-        cancelButton.setMnemonicParsing(false);
-        cancelButton.setPrefHeight(41.0);
-        cancelButton.setPrefWidth(200.0);
-        cancelButton.setStyle("-fx-background-color: lavender;");
-        cancelButton.setText("Cancel");
-        cancelButton.setFont(new Font("System Bold Italic", 14.0));
-        dropShadow2.setSpread(0.45);
-        cancelButton.setEffect(dropShadow2);
+        activePlayersButton=createToggleButton(141.0,-5.0, "Active Players");
+        gameRequestbutton=createToggleButton(292.0,-5.0, "Requests");
+        sendRequestButton=createButton(112.0,358.0, "Send Request");
+        cancelButton=createButton(332.0,358.0, "Cancel");
 
         vBox.setLayoutX(141.0);
         vBox.setLayoutY(43.0);
@@ -120,11 +80,12 @@ public class ActivePlayersBase extends AnchorPane {
         getChildren().add(sendRequestButton);
         getChildren().add(cancelButton);
         getChildren().add(vBox);
+        this.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 
         gameRequestbutton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                gameRequestbutton.setStyle("-fx-background-color: grey;");
+               // gameRequestbutton.setStyle("-fx-background-color: grey;");
              
                 List<String> gameRequests = Arrays.asList("Player1 Request", "Player2 Request");
                 vBox.getChildren().clear();
@@ -147,7 +108,7 @@ public class ActivePlayersBase extends AnchorPane {
             @Override
             public void handle(ActionEvent event) {
                 if (activePlayersButton.isSelected()) {
-                    activePlayersButton.setStyle("-fx-background-color: grey;");
+                    //activePlayersButton.setStyle("-fx-background-color: grey;");
                    
                     List<String> activePlayersNames = Arrays.asList("Player1", "Player2", "Player3");
                     vBox.getChildren().clear();
@@ -166,11 +127,15 @@ public class ActivePlayersBase extends AnchorPane {
             }
         });
         sendRequestButton.setOnAction(event -> {
-    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-    alert.setTitle("Waiting for Approval");
-    alert.setHeaderText(null);
-    alert.setContentText("Please wait for the other player's approval.");
-    alert.showAndWait();
+            if (sendRequestButton.getText().equals("Send Request")){
+                //here you can put your logic for send request
+    showAlert("Waiting for Approval", "Please wait for the other player's approval.");
+            }
+            if (sendRequestButton.getText().equals("Accept")){
+                //here you can put your logic after accept
+             showAlert("ACCEPTED", "Accept");
+            }
+            
 });
         cancelButton.setOnAction(event -> {
     vBox.getChildren().forEach(node -> {
@@ -181,9 +146,14 @@ public class ActivePlayersBase extends AnchorPane {
 });
 
 cancelButton.setOnAction(event -> {
-    if (cancelButton.getText().equals("Declined")) {
-        showAlert("Game Declined", "The sender has declined the game.");
-    }
+    if (cancelButton.getText().equals("Cancel")){
+                //here you can put your logic for cancel
+    showAlert("cancel", "cancel");
+            }
+            if (cancelButton.getText().equals("Decline")){
+                //here you can put your logic after "Decline"
+             showAlert("Decline", "Decline");
+            }
 });
 
 //sendRequestButton.setOnAction(event -> {
@@ -223,6 +193,32 @@ cancelButton.setOnAction(event -> {
     alert.setContentText(message); 
     alert.showAndWait();
 }
+ private ToggleButton createToggleButton(double xDiraction,double yDiraction, String text) {
+        ToggleButton button = new ToggleButton();
+        button.setLayoutX(xDiraction);
+        button.setLayoutY(yDiraction);
+       // button.setBlendMode(javafx.scene.effect.BlendMode.COLOR_BURN);
+        button.setMnemonicParsing(false);
+        button.setPrefHeight(BUTTON_HEIGHT);
+        button.setPrefWidth(BUTTON_WIDTH);
+        button.setText(text);
+        button.setCursor(Cursor.HAND);
+        button.getStyleClass().add("loginAndSignUp-button");
+        return button;
+    }
+      private Button createButton(double xDiraction,double yDiraction, String text) {
+        Button button = new Button();
+        button.setLayoutX(xDiraction);
+        button.setLayoutY(yDiraction);
+        //button.setBlendMode(javafx.scene.effect.BlendMode.COLOR_BURN);
+        button.setMnemonicParsing(false);
+        button.setPrefHeight(BUTTON_HEIGHT);
+        button.setPrefWidth(BUTTON_WIDTH);
+        button.setText(text);
+        button.setCursor(Cursor.HAND);
+        button.getStyleClass().add("loginAndSignUp-button");
+        return button;
+    }
 }
     
 

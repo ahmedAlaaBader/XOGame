@@ -16,7 +16,6 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -50,7 +49,6 @@ public class LogIn extends AnchorPane {
     private static final double BUTTON_HEIGHT = 10.0;
 
     public LogIn() {
-
         imageView = new ImageView();
         imageView0 = new ImageView();
         imageView1 = new ImageView();
@@ -88,8 +86,7 @@ public class LogIn extends AnchorPane {
         imageView1.setImage(new Image(getClass().getResource("/images/OIP-removebg-preview (1).png").toExternalForm()));
 
         logIn = createButton(306.0, "Login");
-       logIn.setOnAction(this::goToActivePlayersBasePage);;
-       // logIn.setOnAction(this::handleLogin);
+        logIn.setOnAction(this::handleLogin);
 
         signUp = createButton(354.0, "Sign Up");
         signUp.setOnAction(this::goToSignUpPage);
@@ -145,91 +142,80 @@ public class LogIn extends AnchorPane {
     }
 
     private void goToSignUpPage(ActionEvent ev) {
-        
-        
-        
         Parent signUpPage = new SignUp();
         Scene selectModeScene = new Scene(signUpPage);
-        // Get the current stage
         Stage stage = (Stage) ((Button) ev.getSource()).getScene().getWindow();
         stage.setScene(selectModeScene);
         stage.show();
     }
-private void goToActivePlayersBasePage(ActionEvent event) {
-        try {
-            // Create an instance of ActivePlayersBase
-            ActivePlayersBase activePlayersBasePage = new ActivePlayersBase();
-            
-            // Create a new scene with ActivePlayersBase
-            Scene selectModeScene = new Scene(activePlayersBasePage);
-            
-            // Get the current stage and set the new scene
-            Stage stage = (Stage) logIn.getScene().getWindow();
-            stage.setScene(selectModeScene);
-        } catch (Exception ex) {
-            ex.printStackTrace(); // Log the error if needed
-        }
+
+    private void goToActivePlayersBasePage() {
+        Platform.runLater(() -> {
+            try {
+                ActivePlayersBase activePlayersBasePage = new ActivePlayersBase();
+                Scene selectModeScene = new Scene(activePlayersBasePage);
+                Stage stage = (Stage) logIn.getScene().getWindow();
+                stage.setScene(selectModeScene);
+                stage.show();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
     }
+
     private void handleLogin(ActionEvent event) {
         new Thread(this::runClient).start();
     }
-   
 
     private void runClient() {
-    try (Socket mySocket = new Socket(InetAddress.getLocalHost(), 5013);
-         DataOutputStream myDataOutStream = new DataOutputStream(mySocket.getOutputStream());
-         DataInputStream myDataInStream = new DataInputStream(mySocket.getInputStream())) {
+        try (Socket mySocket = new Socket(InetAddress.getLocalHost(), 5013);
+             DataOutputStream myDataOutStream = new DataOutputStream(mySocket.getOutputStream());
+             DataInputStream myDataInStream = new DataInputStream(mySocket.getInputStream())) {
 
-        String userName = userNameTextFiled.getText();
-        String password = passwordTextField.getText();
+            String userName = userNameTextFiled.getText();
+            String password = passwordTextField.getText();
 
-        if (userName.isEmpty() || password.isEmpty()) {
+            if (userName.isEmpty() || password.isEmpty()) {
+                Platform.runLater(() -> {
+                    userNameTextFiled.clear();
+                    passwordTextField.clear();
+                    userNameTextFiled.setPromptText("Please fill out this field");
+                    passwordTextField.setPromptText("Please fill out this field");
+                });
+            } else {
+                myDataOutStream.writeUTF("Login");
+                myDataOutStream.writeUTF(userName);
+                myDataOutStream.writeUTF(password);
+
+                String message = myDataInStream.readUTF();
+                Platform.runLater(() -> {
+                    switch (message) {
+                        case "Logged in successfully":
+                            goToActivePlayersBasePage();
+                            break;
+                        case "Password is incorrect":
+                            createTextValidation(passwordTextField, "Password is incorrect");
+                            break;
+                        case "UserName is incorrect":
+                            createTextValidation(userNameTextFiled, "Username is incorrect");
+                            break;
+                        case "This UserName is already signed-in":
+                            createTextValidation(userNameTextFiled, "This UserName is already signed in");
+                            break;
+                        default:
+                            System.out.println("Unknown response from server: " + message);
+                            break;
+                    }
+                });
+            }
+        } catch (ConnectException e) {
             Platform.runLater(() -> {
-                userNameTextFiled.clear();
-                passwordTextField.clear();
-                userNameTextFiled.setPromptText("Please fill out this field");
-                passwordTextField.setPromptText("Please fill out this field");
+                System.err.println("Unable to connect to the server. Please ensure the server is running and accessible.");
             });
-        } else {
-            myDataOutStream.writeUTF("Login");
-            myDataOutStream.writeUTF(userName);
-            myDataOutStream.writeUTF(password);
-
-            String message = myDataInStream.readUTF();
-            Platform.runLater(() -> {
-                Stage primaryStage = new Stage();
-                switch (message) {
-                    case "Logged in successfully":
-                        System.out.println("Login successful");
-                        playGameBase root = new playGameBase();
-                        Scene scene = new Scene(root);
-                        primaryStage.setScene(scene);
-                        primaryStage.setTitle("XO Game");
-                        primaryStage.show();
-                        break;
-                    case "Password is incorrect":
-                        createTextValidation(passwordTextField, "Password is incorrect");
-                        break;
-                    case "UserName is incorrect":
-                        createTextValidation(userNameTextFiled, "Username is incorrect");
-                        break;
-                    case "This UserName is already signed-in":
-                        createTextValidation(userNameTextFiled, "This UserName is already signed in");
-                        break;
-                    default:
-                        System.out.println("Unknown response from server: " + message);
-                        break;
-                }
-            });
+        } catch (IOException e) {
+            Logger.getLogger(LogIn.class.getName()).log(Level.SEVERE, null, e);
         }
-    } catch (ConnectException e) {
-        System.err.println("Unable to connect to the server. Please ensure the server is running and accessible.");
-    } catch (IOException e) {
-        Logger.getLogger(LogIn.class.getName()).log(Level.SEVERE, null, e);
     }
-}
-    
-    
 
     private Text createLabel(int row, int col, String label) {
         Text text = new Text();
@@ -277,14 +263,12 @@ private void goToActivePlayersBasePage(ActionEvent event) {
         button.setText(text);
         button.setCursor(Cursor.HAND);
         button.getStyleClass().add("loginAndSignUp-button");
-
         return button;
     }
-    
-    public void createTextValidation(TextField text, String message){
-    
-                text.clear();
-                text.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
-                text.setPromptText(message);   
+
+    public void createTextValidation(TextField text, String message) {
+        text.clear();
+        text.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
+        text.setPromptText(message);
     }
 }

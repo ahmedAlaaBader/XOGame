@@ -85,8 +85,8 @@ public class selectModeBase extends AnchorPane
         this.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
         this.getStyleClass().add("background");
 
-        String soundFilePath = "file:///F:/project/clinet/src/Sounds/epic-hybrid-logo-157092.mp3";
-
+        String soundFilePath = "file:///F:/java%20labs/simi%20final/client/XOGame/src/Sounds/epic-hybrid-logo-157092.mp3";
+       
         Sound_Player.SoundPlayer.playSound(soundFilePath);
      }
     
