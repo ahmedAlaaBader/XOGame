@@ -41,6 +41,7 @@ public class ActivePlayersBase extends AnchorPane {
     protected final ToggleGroup group1;
     private static final double BUTTON_WIDTH = 150.0;
     private static final double BUTTON_HEIGHT = 41.0;
+    private static final int MAX_RADIOBUTTONS = 15;
 
     public ActivePlayersBase() throws IOException {
 
@@ -85,14 +86,17 @@ public class ActivePlayersBase extends AnchorPane {
         gameRequestbutton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                // gameRequestbutton.setStyle("-fx-background-color: grey;");
                 List<String> gameRequests = Arrays.asList("Player1 Request", "Player2 Request");
                 vBox.getChildren().clear();
                 for (String playerName : gameRequests) {
-                    RadioButton radioButton = new RadioButton(playerName);
-                    radioButton.setFont(new Font("System Bold Italic", 14.0));
-                    radioButton.setToggleGroup(group1);
-                    vBox.getChildren().add(radioButton);
+                    if (vBox.getChildren().size() < MAX_RADIOBUTTONS) {
+                        RadioButton radioButton = new RadioButton(playerName);
+                        radioButton.setFont(new Font("System Bold Italic", 14.0));
+                        radioButton.setToggleGroup(group1);
+                        radioButton.setMaxWidth(vBox.getPrefWidth());
+                        radioButton.setWrapText(true);
+                        vBox.getChildren().add(radioButton);
+                    }
                 }
                 sendRequestButton.setText("Accept");
                 cancelButton.setText("Decline");
@@ -103,30 +107,43 @@ public class ActivePlayersBase extends AnchorPane {
             @Override
             public void handle(ActionEvent event) {
                 if (activePlayersButton.isSelected()) {
-                    fetchActivePlayersFromServer(); // اتصل بالسيرفر لجلب قائمة اللاعبين النشطين
+                    String currentplayer = null;
+                    fetchActivePlayersFromServer(currentplayer);
                     sendRequestButton.setText("Send Request");
                     cancelButton.setText("Cancel");
-                } else {
-                    sendRequestButton.setText("Accept");
-                    cancelButton.setText("Decline");
                 }
             }
         });
 
         sendRequestButton.setOnAction(event -> {
+            boolean isRadioButtonSelected = group1.getSelectedToggle() != null;
+
             if (sendRequestButton.getText().equals("Send Request")) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Waiting for Approval");
-                alert.setHeaderText(null);
-                alert.setContentText("Please wait for the other player's approval.");
-                showAlert("Waiting for Approval", "Please wait for the other player's approval.");
+                if (isRadioButtonSelected) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Waiting for Approval");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Please wait for the other player's approval.");
+                    alert.showAndWait();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("No Selection");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Please select a player before sending a request.");
+                    alert.showAndWait();
+                }
             } else if (sendRequestButton.getText().equals("Accept")) {
                 playGameBase gamePage = new playGameBase();
                 Scene gameScene = new Scene(gamePage, 600, 400);
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(gameScene);
                 stage.show();
-                showAlert("ACCEPTED", "Accept");
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Accepted");
+                alert.setHeaderText(null);
+                alert.setContentText("Request Accepted");
+                alert.showAndWait();
             }
         });
 
@@ -137,7 +154,7 @@ public class ActivePlayersBase extends AnchorPane {
                         ((RadioButton) node).setSelected(false);
                     }
                 });
-                showAlert("Cancel", "Cancel");
+                showAlert("Cancel", "All selections have been cleared.");
             } else if (cancelButton.getText().equals("Decline")) {
                 List<Node> nodesToRemove = new ArrayList<>();
                 vBox.getChildren().forEach(currentNode -> {
@@ -150,12 +167,16 @@ public class ActivePlayersBase extends AnchorPane {
                     }
                 });
                 vBox.getChildren().removeAll(nodesToRemove);
-                showAlert("Decline", "Decline");
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Declined");
+                alert.setHeaderText(null);
+                alert.setContentText("Request is declined.");
+                alert.showAndWait();
             }
         });
     }
 
-    private void fetchActivePlayersFromServer() {
+    private void fetchActivePlayersFromServer(String currentPlayerName) {
         try {
             InetAddress serverAddress = InetAddress.getLocalHost();
             Socket socket = new Socket(serverAddress, 5013);
@@ -171,12 +192,18 @@ public class ActivePlayersBase extends AnchorPane {
                 activePlayersNames.add(input.readUTF());
             }
 
+            activePlayersNames.remove(currentPlayerName);
+
             vBox.getChildren().clear();
             for (String playerName : activePlayersNames) {
-                RadioButton radioButton = new RadioButton(playerName);
-                radioButton.setFont(new Font("System Bold Italic", 14.0));
-                radioButton.setToggleGroup(group1);
-                vBox.getChildren().add(radioButton);
+                if (vBox.getChildren().size() < MAX_RADIOBUTTONS) {
+                    RadioButton radioButton = new RadioButton(playerName);
+                    radioButton.setFont(new Font("System Bold Italic", 14.0));
+                    radioButton.setToggleGroup(group1);
+                    radioButton.setMaxWidth(vBox.getPrefWidth());
+                    radioButton.setWrapText(true);
+                    vBox.getChildren().add(radioButton);
+                }
             }
 
             socket.close();
