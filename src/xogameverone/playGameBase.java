@@ -17,6 +17,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import util.ServerConnector;
 import video_palyer.VideoPalyer;
 
 public  class playGameBase extends BorderPane {
@@ -301,8 +302,9 @@ public  class playGameBase extends BorderPane {
         button.getStyleClass().add("game-button");
         button.setOnMouseClicked((MouseEvent event) -> {
             switch (selectModeBase.selectMode) {
-                case "Two players" :  
-                    handlePlayerMove(button);
+                case "Two players":
+                    playMoveOnline(button);
+                    receiveMoveOnline();
                     break;
                 case "Easy":  
                     handlePlayerMove(button);
@@ -351,7 +353,7 @@ public  class playGameBase extends BorderPane {
             counter++;
             String winner = checkWinner();
             if (winner != null) {
-                displayWinner(winner, winVideoPath);
+               // displayWinner(winner, winVideoPath);
             } else if (counter == 9) {
                 displayDraw("no winner it's draw");
             }
@@ -560,16 +562,42 @@ public  class playGameBase extends BorderPane {
     return "";
 }
    
-   public void movements(ActionEvent event)
-   {
-       Button clickedButton = (Button) event.getSource();
-       int row = GridPane.getRowIndex(clickedButton);
-       int column =  GridPane.getColumnIndex(clickedButton);
-       String btnTxt = clickedButton.getText();
-       move =row + ","+column+","+btnTxt;
-       onlineMovement[row][column] = btnTxt;
-       
-   }
-   
+   private void receiveMoveOnline() {
+        String componentMove = ServerConnector.connect().receiveMove();
 
+        if (componentMove == "Winner") {
+            //handle winning
+        } else if (componentMove == "Loser") {
+            //handle lose
+        } else if (componentMove == "Draw") {
+            //handle draw
+        } else {
+            String[] moveTokens = componentMove.split(",");
+            String row = moveTokens[0];
+            String column = moveTokens[1];
+            String simple = moveTokens[2];
+            
+            //draw simple on 
+        }
+    }
+
+    private void playMoveOnline(Button boardPiece) {
+        if (boardPiece.getText().isEmpty()) {
+            boardPiece.setText(currentPlayer);
+
+            String move = getMovement(boardPiece);
+            ServerConnector.connect().sendMove(move);
+        }
+    }
+
+    public String getMovement(Button button) {
+        int row = GridPane.getRowIndex(button);
+        int column = GridPane.getColumnIndex(button);
+        String btnTxt = button.getText();
+
+        move = row + "," + column + "," + btnTxt;
+        System.out.print(move);
+
+        return move;
+    }
 }

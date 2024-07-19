@@ -1,4 +1,4 @@
-
+/*
 package xogameverone;
 
 import java.io.DataInputStream;
@@ -66,4 +66,5 @@ protected  void sendMovement(javafx.event.ActionEvent actionEvent) {
             Logger.getLogger(ServerClint.class.getName()).log(Level.SEVERE, null, ex);
        }
     }
-}
+
+} */

@@ -17,17 +17,11 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.scene.Parent;
+import util.ServerConnector;
 
 public class LogIn extends AnchorPane {
-     
+
     protected final ImageView imageView;
     protected final ImageView imageView0;
     protected final ImageView imageView1;
@@ -46,10 +40,10 @@ public class LogIn extends AnchorPane {
     protected final PasswordField passwordTextField;
     private static final double BUTTON_WIDTH = 510.0;
     private static final double BUTTON_HEIGHT = 10.0;
-   // protected final Button twoPlayersBtn;
+    // protected final Button twoPlayersBtn;
 
     public LogIn() {
-        
+
         imageView = new ImageView();
         imageView0 = new ImageView();
         imageView1 = new ImageView();
@@ -152,41 +146,26 @@ public class LogIn extends AnchorPane {
     }
 
     private void handleLogin(ActionEvent event) {
-        new Thread(this::runClient).start();
-    }
+        String userName = userNameTextFiled.getText();
+        String password = passwordTextField.getText();
 
-    private void runClient() {
-        try (Socket mySocket = new Socket(InetAddress.getLocalHost(), 5013);
-             DataOutputStream myDataOutStream = new DataOutputStream(mySocket.getOutputStream());
-             DataInputStream myDataInStream = new DataInputStream(mySocket.getInputStream())) {
-
-            String userName = userNameTextFiled.getText();
-            String password = passwordTextField.getText();
-            
-            Stage s=new Stage();
-            if (userName.isEmpty() || password.isEmpty()) 
-            {
+        Stage s = new Stage();
+        if (userName.isEmpty() || password.isEmpty()) {
             userNameTextFiled.clear();
             passwordTextField.clear();
             userNameTextFiled.setPromptText("Please fill out this field");
             passwordTextField.setPromptText("Please fill out this field");
-            } 
-            else {
-            
-            myDataOutStream.writeUTF("Login");
-            myDataOutStream.writeUTF(userName);
-            myDataOutStream.writeUTF(password);
-
-            String message = myDataInStream.readUTF();
+        } else {
+            String message = ServerConnector.connect().authenticate(userName, password);
             //System.out.println("Server Response: " + message);
             switch (message) {
                 case "Logged in successfully":
                     //System.out.println("Server Response: " + message);
-                   LogIn root = new LogIn();
-                   Scene scene = new Scene(root);
-                   s.setScene(scene);
-                   s.setTitle("XO Game");
-                   s.show();
+                    LogIn root = new LogIn();
+                    Scene scene = new Scene(root);
+                    s.setScene(scene);
+                    s.setTitle("XO Game");
+                    s.show();
                     break;
                 case "Password is incorrect":
                     passwordTextField.setText("");
@@ -204,10 +183,6 @@ public class LogIn extends AnchorPane {
                     System.out.println("Unknown response from server: " + message);
                     break;
             }
-            }
-
-        } catch (IOException e) {
-            Logger.getLogger(LogIn.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
@@ -260,8 +235,8 @@ public class LogIn extends AnchorPane {
 
         return button;
     }
-    private void handleEsayOrHardButtonAction(ActionEvent event) 
-    {
+
+    private void handleEsayOrHardButtonAction(ActionEvent event) {
         Parent playGame = new playGameBase();
         Scene selectModeScene = new Scene(playGame);
         // Get the current stage
