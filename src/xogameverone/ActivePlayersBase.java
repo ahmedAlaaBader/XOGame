@@ -5,11 +5,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
@@ -44,9 +47,7 @@ public class ActivePlayersBase extends AnchorPane {
         imageView = new ImageView();
         dropShadow = new DropShadow();
         dropShadow0 = new DropShadow();
-       
         dropShadow1 = new DropShadow();
-        
         dropShadow2 = new DropShadow();
         vBox = new VBox();
         group1 = new ToggleGroup();
@@ -61,13 +62,12 @@ public class ActivePlayersBase extends AnchorPane {
         imageView.setFitHeight(407.0);
         imageView.setFitWidth(600.0);
         imageView.setLayoutY(-5.0);
-       imageView.setImage(new Image("/images/khlfia.png"));
+        imageView.setImage(new Image("/images/khlfia.png"));
 
-
-        activePlayersButton=createToggleButton(141.0,-5.0, "Active Players");
-        gameRequestbutton=createToggleButton(292.0,-5.0, "Requests");
-        sendRequestButton=createButton(112.0,358.0, "Send Request");
-        cancelButton=createButton(332.0,358.0, "Cancel");
+        activePlayersButton = createToggleButton(141.0, -5.0, "Active Players");
+        gameRequestbutton = createToggleButton(292.0, -5.0, "Requests");
+        sendRequestButton = createButton(112.0, 358.0, "Send Request");
+        cancelButton = createButton(332.0, 358.0, "Cancel");
 
         vBox.setLayoutX(141.0);
         vBox.setLayoutY(43.0);
@@ -85,8 +85,7 @@ public class ActivePlayersBase extends AnchorPane {
         gameRequestbutton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-               // gameRequestbutton.setStyle("-fx-background-color: grey;");
-             
+                // gameRequestbutton.setStyle("-fx-background-color: grey;");
                 List<String> gameRequests = Arrays.asList("Player1 Request", "Player2 Request");
                 vBox.getChildren().clear();
                 for (String playerName : gameRequests) {
@@ -97,27 +96,14 @@ public class ActivePlayersBase extends AnchorPane {
                 }
                 sendRequestButton.setText("Accept");
                 cancelButton.setText("Decline");
-                
-                
             }
         });
-        
-        
 
         activePlayersButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 if (activePlayersButton.isSelected()) {
-                    //activePlayersButton.setStyle("-fx-background-color: grey;");
-                   
-                    List<String> activePlayersNames = Arrays.asList("Player1", "Player2", "Player3");
-                    vBox.getChildren().clear();
-                    for (String playerName : activePlayersNames) {
-                        RadioButton radioButton = new RadioButton(playerName);
-                        radioButton.setFont(new Font("System Bold Italic", 14.0));
-                        radioButton.setToggleGroup(group1);
-                        vBox.getChildren().add(radioButton);
-                    }
+                    fetchActivePlayersFromServer(); // اتصل بالسيرفر لجلب قائمة اللاعبين النشطين
                     sendRequestButton.setText("Send Request");
                     cancelButton.setText("Cancel");
                 } else {
@@ -126,78 +112,91 @@ public class ActivePlayersBase extends AnchorPane {
                 }
             }
         });
+
         sendRequestButton.setOnAction(event -> {
-            if (sendRequestButton.getText().equals("Send Request")){
-                //here you can put your logic for send request
-    showAlert("Waiting for Approval", "Please wait for the other player's approval.");
+            if (sendRequestButton.getText().equals("Send Request")) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Waiting for Approval");
+                alert.setHeaderText(null);
+                alert.setContentText("Please wait for the other player's approval.");
+                showAlert("Waiting for Approval", "Please wait for the other player's approval.");
+            } else if (sendRequestButton.getText().equals("Accept")) {
+                playGameBase gamePage = new playGameBase();
+                Scene gameScene = new Scene(gamePage, 600, 400);
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(gameScene);
+                stage.show();
+                showAlert("ACCEPTED", "Accept");
             }
-            if (sendRequestButton.getText().equals("Accept")){
-                //here you can put your logic after accept
-             showAlert("ACCEPTED", "Accept");
-            }
-            
-});
+        });
+
         cancelButton.setOnAction(event -> {
-    vBox.getChildren().forEach(node -> {
-        if (node instanceof RadioButton) {
-            ((RadioButton) node).setSelected(false);
+            if (cancelButton.getText().equals("Cancel")) {
+                vBox.getChildren().forEach(node -> {
+                    if (node instanceof RadioButton) {
+                        ((RadioButton) node).setSelected(false);
+                    }
+                });
+                showAlert("Cancel", "Cancel");
+            } else if (cancelButton.getText().equals("Decline")) {
+                List<Node> nodesToRemove = new ArrayList<>();
+                vBox.getChildren().forEach(currentNode -> {
+                    if (currentNode instanceof RadioButton) {
+                        RadioButton radioButton = (RadioButton) currentNode;
+                        if (radioButton.isSelected()) {
+                            nodesToRemove.add(currentNode);
+                            radioButton.setSelected(false);
+                        }
+                    }
+                });
+                vBox.getChildren().removeAll(nodesToRemove);
+                showAlert("Decline", "Decline");
+            }
+        });
+    }
+
+    private void fetchActivePlayersFromServer() {
+        try {
+            InetAddress serverAddress = InetAddress.getLocalHost();
+            Socket socket = new Socket(serverAddress, 5013);
+            DataInputStream input = new DataInputStream(socket.getInputStream());
+            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+
+            output.writeUTF("GetActivePlayers");
+
+            int size = input.readInt();
+            List<String> activePlayersNames = new ArrayList<>();
+
+            for (int i = 0; i < size; i++) {
+                activePlayersNames.add(input.readUTF());
+            }
+
+            vBox.getChildren().clear();
+            for (String playerName : activePlayersNames) {
+                RadioButton radioButton = new RadioButton(playerName);
+                radioButton.setFont(new Font("System Bold Italic", 14.0));
+                radioButton.setToggleGroup(group1);
+                vBox.getChildren().add(radioButton);
+            }
+
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    });
-});
+    }
 
-cancelButton.setOnAction(event -> {
-    if (cancelButton.getText().equals("Cancel")){
-                //here you can put your logic for cancel
-    showAlert("cancel", "cancel");
-            }
-            if (cancelButton.getText().equals("Decline")){
-                //here you can put your logic after "Decline"
-             showAlert("Decline", "Decline");
-            }
-});
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 
-//sendRequestButton.setOnAction(event -> {
-//   if (sendRequestButton.getText().equals("Accept")) {
-//        openGamePage(primaryStage);
-//    }
-//});
-
-
-
-
-      
-        InetAddress serverAddress = InetAddress.getLocalHost();
-        Socket socket = new Socket(serverAddress, 5013);
-        DataInputStream input = new DataInputStream(socket.getInputStream());
-        DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-
-        output.writeUTF("PlayerName");
-
-        //String response = input.readUTF();
-        //System.out.println("Received from server: " + response);
-
-        //String playersList = input.readUTF();
-        //System.out.println("Current players: " + playersList);
-
-        output.writeUTF("/request ReceiverName Let's play!");
-
-      //  String requestResponse = input.readUTF();
-        //System.out.println("Request response: " + requestResponse);
-
-        socket.close();}
-
- private void showAlert(String title, String message) {
-    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-    alert.setTitle(title);
-    alert.setHeaderText(null); 
-    alert.setContentText(message); 
-    alert.showAndWait();
-}
- private ToggleButton createToggleButton(double xDiraction,double yDiraction, String text) {
+    private ToggleButton createToggleButton(double xDiraction, double yDiraction, String text) {
         ToggleButton button = new ToggleButton();
         button.setLayoutX(xDiraction);
         button.setLayoutY(yDiraction);
-       // button.setBlendMode(javafx.scene.effect.BlendMode.COLOR_BURN);
         button.setMnemonicParsing(false);
         button.setPrefHeight(BUTTON_HEIGHT);
         button.setPrefWidth(BUTTON_WIDTH);
@@ -206,11 +205,11 @@ cancelButton.setOnAction(event -> {
         button.getStyleClass().add("loginAndSignUp-button");
         return button;
     }
-      private Button createButton(double xDiraction,double yDiraction, String text) {
+
+    private Button createButton(double xDiraction, double yDiraction, String text) {
         Button button = new Button();
         button.setLayoutX(xDiraction);
         button.setLayoutY(yDiraction);
-        //button.setBlendMode(javafx.scene.effect.BlendMode.COLOR_BURN);
         button.setMnemonicParsing(false);
         button.setPrefHeight(BUTTON_HEIGHT);
         button.setPrefWidth(BUTTON_WIDTH);
@@ -220,5 +219,3 @@ cancelButton.setOnAction(event -> {
         return button;
     }
 }
-    
-
