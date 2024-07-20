@@ -162,6 +162,7 @@ public class LogIn extends AnchorPane {
                 case "Logged in successfully":
                     //System.out.println("Server Response: " + message);
                     playGameBase root = new playGameBase();
+                    root.initializeOnlinePlayer();
                     Scene scene = new Scene(root);
                     s.setScene(scene);
                     s.setTitle("XO Game");

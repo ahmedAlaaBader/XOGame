@@ -283,9 +283,6 @@ public class playGameBase extends BorderPane {
         gridPane0.getChildren().add(xScoreTxt);
         gridPane0.getChildren().add(oScoreTxt);
         this.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
-
-        this.currentPlayer = ServerConnector.connect().receiveInitialPlayer();
-        System.out.println("Inital Player: " + this.currentPlayer);
     }
 
     private void handleButtonProperties(Button button) {
@@ -561,6 +558,11 @@ public class playGameBase extends BorderPane {
         }
 
         return "";
+    }
+
+    public void initializeOnlinePlayer() {
+        this.currentPlayer = ServerConnector.connect().receiveInitialPlayer();
+        System.out.println("Inital Player: " + this.currentPlayer);
     }
 
     private void receiveGameStatus() {
