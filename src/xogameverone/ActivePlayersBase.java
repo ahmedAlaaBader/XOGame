@@ -22,6 +22,7 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import static javafx.scene.layout.Region.USE_PREF_SIZE;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -83,25 +84,24 @@ public class ActivePlayersBase extends AnchorPane {
         getChildren().add(vBox);
         this.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 
-        gameRequestbutton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                List<String> gameRequests = Arrays.asList("Player1 Request", "Player2 Request");
-                vBox.getChildren().clear();
-                for (String playerName : gameRequests) {
-                    if (vBox.getChildren().size() < MAX_RADIOBUTTONS) {
-                        RadioButton radioButton = new RadioButton(playerName);
-                        radioButton.setFont(new Font("System Bold Italic", 14.0));
-                        radioButton.setToggleGroup(group1);
-                        radioButton.setMaxWidth(vBox.getPrefWidth());
-                        radioButton.setWrapText(true);
-                        vBox.getChildren().add(radioButton);
-                    }
-                }
-                sendRequestButton.setText("Accept");
-                cancelButton.setText("Decline");
-            }
-        });
+       gameRequestbutton.setOnAction(event -> {
+    List<String> gameRequests = fetchGameRequestsFromServer();
+    vBox.getChildren().clear();
+    for (String playerName : gameRequests) {
+        if (vBox.getChildren().size() < MAX_RADIOBUTTONS) {
+            RadioButton radioButton = new RadioButton(playerName);
+            radioButton.setFont(new Font("System Bold Italic", 14.0));
+            radioButton.setToggleGroup(group1);
+            radioButton.setMaxWidth(vBox.getPrefWidth());
+            radioButton.setWrapText(true);
+            vBox.getChildren().add(radioButton);
+        }
+    }
+    sendRequestButton.setText("Accept");
+    cancelButton.setText("Decline");
+});
+
+
 
         activePlayersButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -115,38 +115,51 @@ public class ActivePlayersBase extends AnchorPane {
             }
         });
 
-        sendRequestButton.setOnAction(event -> {
-            boolean isRadioButtonSelected = group1.getSelectedToggle() != null;
+       sendRequestButton.setOnAction(event -> {
+    boolean isRadioButtonSelected = group1.getSelectedToggle() != null;
+    String selectedPlayer = isRadioButtonSelected ? ((RadioButton) group1.getSelectedToggle()).getText() : null;
 
-            if (sendRequestButton.getText().equals("Send Request")) {
-                if (isRadioButtonSelected) {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Waiting for Approval");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Please wait for the other player's approval.");
-                    alert.showAndWait();
-                } else {
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("No Selection");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Please select a player before sending a request.");
-                    alert.showAndWait();
-                }
-            } else if (sendRequestButton.getText().equals("Accept")) {
-                playGameBase gamePage = new playGameBase();
-                Scene gameScene = new Scene(gamePage, 600, 400);
-                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                stage.setScene(gameScene);
-                stage.show();
+    if (sendRequestButton.getText().equals("Send Request")) {
+        if (isRadioButtonSelected) {
+            sendRequest(selectedPlayer, "currentPlayerName"); 
 
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Accepted");
-                alert.setHeaderText(null);
-                alert.setContentText("Request Accepted");
-                alert.showAndWait();
-            }
-        });
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Waiting for Approval");
+            alert.setHeaderText(null);
+            alert.setContentText("Please wait for the other player's approval.");
+            alert.showAndWait();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No Selection");
+            alert.setHeaderText(null);
+            alert.setContentText("Please select a player before sending a request.");
+            alert.showAndWait();
+        }
+    }  else if (sendRequestButton.getText().equals("Accept")) {
+        if (isRadioButtonSelected) {
+            playGameBase gamePage = new playGameBase();
+            Scene gameScene = new Scene(gamePage, 600, 400);
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(gameScene);
+            stage.show();
 
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Accepted");
+            alert.setHeaderText(null);
+            alert.setContentText("Request Accepted");
+            alert.showAndWait();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No Selection");
+            alert.setHeaderText(null);
+            alert.setContentText("Please select a request before accepting.");
+            alert.showAndWait();
+        }
+    }
+});
+
+
+        
         cancelButton.setOnAction(event -> {
             if (cancelButton.getText().equals("Cancel")) {
                 vBox.getChildren().forEach(node -> {
@@ -177,40 +190,103 @@ public class ActivePlayersBase extends AnchorPane {
     }
 
     private void fetchActivePlayersFromServer(String currentPlayerName) {
-        try {
-            InetAddress serverAddress = InetAddress.getLocalHost();
-            Socket socket = new Socket(serverAddress, 5013);
-            DataInputStream input = new DataInputStream(socket.getInputStream());
-            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+    try {
+        InetAddress serverAddress = InetAddress.getLocalHost();
+        Socket socket = new Socket(serverAddress, 5013);
+        DataInputStream input = new DataInputStream(socket.getInputStream());
+        DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 
-            output.writeUTF("GetActivePlayers");
+        output.writeUTF("GetActivePlayers");
 
-            int size = input.readInt();
-            List<String> activePlayersNames = new ArrayList<>();
+        int size = input.readInt();
+        List<String> activePlayersNames = new ArrayList<>();
 
-            for (int i = 0; i < size; i++) {
-                activePlayersNames.add(input.readUTF());
-            }
-
-            activePlayersNames.remove(currentPlayerName);
-
-            vBox.getChildren().clear();
-            for (String playerName : activePlayersNames) {
-                if (vBox.getChildren().size() < MAX_RADIOBUTTONS) {
-                    RadioButton radioButton = new RadioButton(playerName);
-                    radioButton.setFont(new Font("System Bold Italic", 14.0));
-                    radioButton.setToggleGroup(group1);
-                    radioButton.setMaxWidth(vBox.getPrefWidth());
-                    radioButton.setWrapText(true);
-                    vBox.getChildren().add(radioButton);
-                }
-            }
-
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (int i = 0; i < size; i++) {
+            activePlayersNames.add(input.readUTF());
         }
+
+     
+        if (currentPlayerName != null) {
+            activePlayersNames.remove(currentPlayerName);
+        }
+
+      
+        if (activePlayersNames.size() > MAX_RADIOBUTTONS) {
+            activePlayersNames = activePlayersNames.subList(activePlayersNames.size() - MAX_RADIOBUTTONS, activePlayersNames.size());
+        }
+
+        vBox.getChildren().clear();
+        for (String playerName : activePlayersNames) {
+            if (vBox.getChildren().size() < MAX_RADIOBUTTONS) {
+                RadioButton radioButton = new RadioButton(playerName);
+                radioButton.setFont(new Font("System Bold Italic", 14.0));
+                radioButton.setToggleGroup(group1);
+                radioButton.setMaxWidth(vBox.getPrefWidth());
+                radioButton.setWrapText(true);
+                vBox.getChildren().add(radioButton);
+            }
+        }
+
+        socket.close();
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+}
+   public void sendRequest(String targetPlayer, String requestor) {
+    try (Socket socket = new Socket("localhost", 5013);
+         DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+         DataInputStream input = new DataInputStream(socket.getInputStream())) {
+        
+        
+        output.writeUTF("SendRequest");
+        output.writeUTF(targetPlayer);
+        output.writeUTF(requestor);
+        output.flush();
+        
+      
+        String response = input.readUTF();
+        System.out.println("Response from server: " + response);
+
+        System.out.println("Request sent to server. Target: " + targetPlayer + ", Requestor: " + requestor);
+        
+    } catch (IOException e) {
+        System.err.println("Error sending request: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
+ private List<String> fetchGameRequestsFromServer() {
+    List<String> gameRequests = new ArrayList<>();
+    try (Socket socket = new Socket("localhost", 5013);
+         DataInputStream input = new DataInputStream(socket.getInputStream());
+         DataOutputStream output = new DataOutputStream(socket.getOutputStream())) {
+
+        output.writeUTF("GetGameRequests");
+        output.flush();
+        System.out.println("Request sent to server: GetGameRequests");
+
+        int count = input.readInt();
+        System.out.println("Number of requests expected: " + count);
+
+        for (int i = 0; i < count; i++) {
+            String request = input.readUTF();
+            System.out.println("Received request: " + request);
+            gameRequests.add(request);
+        }
+
+    } catch (IOException e) {
+        System.err.println("Error fetching game requests from server: " + e.getMessage());
+        e.printStackTrace();
+    }
+    return gameRequests;
+}
+
+
+
+
+
+
+    
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
