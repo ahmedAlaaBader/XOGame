@@ -85,7 +85,8 @@ public class selectModeBase extends AnchorPane
         this.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
         this.getStyleClass().add("background");
 
-        String soundFilePath = "file:///D:/iti/Project/client/src/Sounds/epic-hybrid-logo-157092.mp3";
+        String soundFilePath = "file:///F:/java%20labs/finalClient/src/Sounds/epic-hybrid-logo-157092.mp3";
+      
 
         Sound_Player.SoundPlayer.playSound(soundFilePath);
      }
@@ -131,5 +132,6 @@ public class selectModeBase extends AnchorPane
         stage.setScene(selectModeScene);
         stage.show();
     }
+    
 }
 
