@@ -1,5 +1,5 @@
 ## Description
-A simple Tic Tac Toe game implemented in Python. The game allows two players to play against each other. The first player to align three of their marks horizontally, vertically, or diagonally wins the game.
+A simple Tic Tac Toe game implemented in java. The game allows two players to play against each other. The first player to align three of their marks horizontally, vertically, or diagonally wins the game.
 
 ## Table of Contents
 - [Features](#features)
